@@ -84,13 +84,12 @@ void GLArea::ResetearPieza(){
     planosIntersecta = new bool[numPlanos];
     for(int i=0; i<numPlanos; ++i)
         planosIntersecta[i] = false;
-    puntosCircuncentro = new vcg::Point3f [numPlanos];
 
     vcg::Point3f ejeOrigen (0,-0.8,20);
     vcg::Point3f ejeDireccion (0,0,-40);
     ejeFinal.Set(ejeOrigen,ejeDireccion);
     //todos estos en falso
-    dibujarEje = dibujarAristas = dibujarVoxels = piezaCargada = ransacCalculado = cambiaDibujo = pintar = planoInterseccion = ejeDibujando = normalesObtenidas = voxelesDibujando = seleccionarActivado = false;
+    dibujarEje = dibujarEjeDePrueba = dibujarAristas = dibujarVoxels = piezaCargada = ransacCalculado = cambiaDibujo = pintar = planoInterseccion = ejeDibujando = normalesObtenidas = voxelesDibujando = seleccionarActivado = false;
     modoDibujado = true;
 }
 
@@ -307,16 +306,6 @@ void GLArea::paintGL ()
                     glPopMatrix();
                 }
             glEnd();*/
-            //Dibujar el eje
-            glColor3f(1,0,0);
-            glBegin(GL_LINE);
-                glVertex3f(ejeFinal.Origin().X() - ejeFinal.Direction().X(),
-                           ejeFinal.Origin().Y() - ejeFinal.Direction().Y(),
-                           ejeFinal.Origin().Z() - ejeFinal.Direction().Z());
-                glVertex3f(ejeFinal.Origin().X() + ejeFinal.Direction().X(),
-                           ejeFinal.Origin().Y() + ejeFinal.Direction().Y(),
-                           ejeFinal.Origin().Z() + ejeFinal.Direction().Z());
-            glEnd();
             glPopMatrix();
         }else{ //Dibujar ANTES de reconstruir
             if(planoInterseccion) //Dibujar plano de prueba
@@ -333,6 +322,17 @@ void GLArea::paintGL ()
                            ejeFinal.Origin().Y() + 100.*ejeFinal.Direction().Y(),
                            ejeFinal.Origin().Z() + 100.*ejeFinal.Direction().Z());
                 glEnd();
+                if(dibujarEjeDePrueba){
+                    glColor3f(0,0,1);
+                    glBegin(GL_LINES);
+                    glVertex3f(ejeDePrueba.Origin().X() - 100.*ejeDePrueba.Direction().X(),
+                               ejeDePrueba.Origin().Y() - 100.*ejeDePrueba.Direction().Y(),
+                               ejeDePrueba.Origin().Z() - 100.*ejeDePrueba.Direction().Z());
+                    glVertex3f(ejeDePrueba.Origin().X() + 100.*ejeDePrueba.Direction().X(),
+                               ejeDePrueba.Origin().Y() + 100.*ejeDePrueba.Direction().Y(),
+                               ejeDePrueba.Origin().Z() + 100.*ejeDePrueba.Direction().Z());
+                    glEnd();
+                }
                 glEnable(GL_LIGHTING);
                 glPopMatrix();
             }
@@ -393,13 +393,31 @@ void GLArea::paintGL ()
             glPopMatrix();
             if(dibujarAristas){
                 glColor3f(1,0,0);
-                for(int j=0; j<2; ++j){
-                    glBegin(GL_LINE_STRIP);
-                    for(int i=0; i<puntosDibujar[j].size(); ++i){
-                        glVertex3f(puntosDibujar[j].value(i).X(),puntosDibujar[j].value(i).Y(),puntosDibujar[j].value(i).Z());
-                    }
-                    glEnd();
+                glEnable(GL_POINT_SMOOTH);
+                glDisable(GL_LIGHTING);
+                glPointSize(2);
+                for(int j=0; j<3; ++j){
+                    //if(planoIntersecta[j]){
+                        glBegin(GL_POINTS);
+                        for(int i=0; i<puntosDibujar[j].size(); ++i){
+                                glVertex3f(puntosDibujar[j].value(i).X(),puntosDibujar[j].value(i).Y(),puntosDibujar[j].value(i).Z());
+                        }
+                        glEnd();
+                    //}
                 }
+                glColor3f(0,1,0);
+                glPointSize(10);
+                glBegin(GL_POINTS);
+                glVertex3f(centro[0].X(),centro[0].Y(),centro[0].Z());
+                glVertex3f(centro[1].X(),centro[1].Y(),centro[1].Z());
+                glEnd();
+                glPointSize(1);
+                glDisable(GL_POINT_SMOOTH);
+                glBegin(GL_LINES);
+                glVertex3f(centro[0].X(),centro[0].Y(),centro[0].Z());
+                glVertex3f(centro[1].X(),centro[1].Y(),centro[1].Z());
+                glEnd();
+                glEnable(GL_LIGHTING);
             }
             if(modoDibujado)
                 switch(drawmode)
@@ -627,11 +645,16 @@ void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int l
             dibujarEje = true;
         }
     }else{
-        hebra->setParametros(parametrosCargados);
-        hebra->setOperacion(0);
-        hebra->insertarDatos(glWrap);
 
-        hebra->start();
+        if(hebra->isRunning())
+            ;//emit AvisoError();
+        else{
+            hebra->setParametros(parametrosCargados);
+            hebra->setOperacion(0);
+            hebra->insertarDatos(glWrap);
+
+            hebra->start();
+        }
     }
 }
 
@@ -1023,121 +1046,181 @@ void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFi
     dibujarAristas = true;
 }
 
-float GLArea::calidadDelEje(float error, int numPlanos = 2){
-    vcg::Point3f centro = glWrap.m->bbox.Center();
+float GLArea::calidadDelEje(float error, int numPlanos = 3){
+    vcg::Point3f puntoNuevo, puntoViejo;
     vcg::Plane3f plano;
     aristacas = new CEMesh [numPlanos];
     int contador = 0;
+    CEMesh::EdgeIterator ei;
+    vcg::Quaternionf quaternion, quaternionInverso;
+    vcg::Matrix33f matrizGrande;
+    vcg::Point3f vectorDerecha,vectorIzquierda;
+    float theta, fi;
 
-    // CAMBIAR TODO LO DE AQUI ABJO PARA QUE NO HAGA LA INTERSECCION DE UN PLANO
-    // SI NO QUE CALCULE LA INTERSECCION DE VARIAS RECTAS QUE PASEN POR LA PIEZA
-    // PUEDO CALCULAR EL PUNTO DE ORIGEN DE LA RECTA, HACIENDO LA INTERSECCION ENTRE
-    // EL PLANO Y EL EJE FINAL
-    // LUEGO INTERSECTO CON LA RECA LA FIGURA Y ME DARA DOS PUNTOS, ME QUEDO CON EL MAS CERCANO
+ //   delete [] puntosDibujar;
+ //   puntosDibujar = new QList<vcg::Point3f> [3];
+
+    planoIntersecta = new bool [3];
+    for(int i=0; i<3; ++i)
+        planoIntersecta[i] = false;
     plano.Set(ejeFinal.Direction(),(-0.3 * diagonal));
-    if(InterseccionPlanoPieza(plano,0))contador++;
-    plano.Set(ejeFinal.Direction(),(0.3 * diagonal));
-    if(InterseccionPlanoPieza(plano,1))contador++;
-    /*
-    for(int i = 0; i<numPlanos; ++i){
-        plano.Set(ejeFinal.Direction(),(-0.3 + i/numPlanos * 0.6)*diagonal);
-        if(InterseccionPlanoPieza(plano,i))contador++;
+    if(InterseccionPlanoPieza(plano,0)){
+        contador++;
+        planoIntersecta[0] = true;
     }
-    */
-/*
-    QMultiMap<float, PuntoOrdenable> listaDePuntos;
-    QList<PuntoOrdenable> puntosEnvolvente;
-    vcg::Point3f puntoEnElEje, punto0, aux;
-    PuntoOrdenable nuevoPunto;
-    for(int i=0; i<2; ++i){
-        listaDePuntos.clear();
-        int numVertices = aristacas[i].edges.size();
-        float angulo;
-        CEMesh::EdgeIterator veI;
-        veI = aristacas[i].edges.begin();
-        punto0 = veI->P(0);
-        puntoEnElEje = vcg::ClosestPoint(ejeFinal,punto0);
-        punto0 = vcg::ClosestPoint(vcg::Line3f(ejeFinal.Origin()*2,ejeFinal.Direction()),punto0);
-        punto0 = punto0 - puntoEnElEje;
-        float distancia = 0;
-        while(veI != aristacas[i].edges.end()){
-            nuevoPunto.set((*veI).P(0));
-            aux = veI->P(0) - puntoEnElEje;
-            angulo = vcg::Angle(punto0,aux);
-            nuevoPunto.asignarAngulo(angulo);
-            nuevoPunto.asignarDistancia(aux.Norm());
-            distancia += aux.Norm();
-            listaDePuntos.insert(angulo,nuevoPunto);/*
-            emit Imprimir("\n"+
-                          QString::number(nuevoPunto.posicion.X())+"\t"+
-                          QString::number(nuevoPunto.posicion.Y())+"\t"+
-                          QString::number(nuevoPunto.posicion.Z())+"\t"+
-                          QString::number(nuevoPunto.angulo()));
-            veI++;
-        }
-        distancia/=listaDePuntos.size();
+    plano.Set(ejeFinal.Direction(),(0 * diagonal));
+    if(InterseccionPlanoPieza(plano,1)){
+        contador++;
+        planoIntersecta[1] = true;
+    }
+    plano.Set(ejeFinal.Direction(),(0.3 * diagonal));
+    if(InterseccionPlanoPieza(plano,2)){
+        contador++;
+        planoIntersecta[2] = true;
+    }
 
-        emit Imprimir("\n" + QString::number(distancia));
-        QMultiMap<float, PuntoOrdenable>::iterator it = listaDePuntos.begin();
-        distancia = it->distancia();
-        int descarta = listaDePuntos.size()/4., descartaInicial = listaDePuntos.size()/4.;
-        float min = 1000;
-        vcg::Point3f puntoMinimo;
-        while(it != listaDePuntos.end()){
-            puntosDibujar[i].append(it->posicion);
-            descarta--;
-            if(it->distancia()<min){
-                min = it->distancia();
-                puntoMinimo = it->posicion;
-            }
-            it++;
-            if(descarta == 0 || it == listaDePuntos.end()){
-                puntosDibujar[i].append(puntoMinimo);
-                descarta = descartaInicial;
-                min = 10000;
-            }
+    if(contador >= 2){
+        float x2, y2, x2y2,xy;
+        for(int i=0; i<3; ++i){
+            vectorDerecha[i] = 0;
+            for(int j=0; j<3; ++j)
+                matrizGrande[i][j] = 0;
         }
 
-
-*/
-    /*
-
-        vcg::Point3f * puntos [2], puntoEnElEje, aux2, aux;
-        int j;
-        float * distancias [2], * angulos[2];
+        fi = atan2(ejeFinal.Direction().X(),ejeFinal.Direction().Y());
+        theta = sqrt(ejeFinal.Direction().X()*ejeFinal.Direction().X()+
+                    ejeFinal.Direction().Y()*ejeFinal.Direction().Y()+
+                    ejeFinal.Direction().Z()*ejeFinal.Direction().Z());
+        theta = ejeFinal.Direction().Z()/theta;
+        theta = theta<0?-acos(-theta):acos(theta);
+        //emit Imprimir("Tiene que girarse "+QString::number(theta)+" "+QString::number(fi));
+        quaternion.FromEulerAngles(-theta,-fi,0);
+        quaternionInverso.FromEulerAngles(theta,fi,0);
+        ejeDePrueba.Set(vcg::Point3f(0,0,0),quaternion.Rotate(ejeFinal.Direction()));
         for(int i=0; i<numPlanos; ++i){
-            emit Imprimir(tr("\n"));
-            puntos[i] = new vcg::Point3f [aristacas[i].vert.size()];
-            distancias[i] = new float [aristacas[i].vert.size()];
-            angulos[i] = new float [aristacas[i].vert.size()];
-            j = 0;
-            aux2 = verticesOrdenados[i].at(0);
-            puntoEnElEje = vcg::ClosestPoint(ejeFinal,verticesOrdenados[i].at(0));
-            aux2 = aux2 - puntoEnElEje;
-            foreach(vcg::Point3f verticeActual, verticesOrdenados[i]){
-                aux = verticeActual - puntoEnElEje;
-                angulos[i][j] = vcg::Angle(aux2,aux);
-                aux2 = aux;
-                distancias[i][j] = (puntoEnElEje - verticeActual).Norm();
-                emit Imprimir("\n" + QString::number(angulos[i][j]) + "\t" + QString::number(distancias[i][j]));
-                j++;
-            }
-            emit Imprimir(tr("\n"));
+            //if(planoIntersecta[i]){
+                for(int k=0; k<3; ++k){
+                    vectorDerecha[k] = 0;
+                    for(int j=0; j<3; ++j)
+                        matrizGrande[k][j] = 0;
+                }
+                ei = aristacas[i].edges.begin();
+                while(ei!=aristacas[i].edges.end()){
+                    puntoNuevo = ei->P(0);
+                    puntosDibujar[i].append(puntoNuevo);
+                    puntoNuevo = quaternion.Rotate(puntoNuevo);
+                    ei++;
+                    x2 = puntoNuevo.X()*puntoNuevo.X();
+                    y2 = puntoNuevo.Y()*puntoNuevo.Y();
+                    x2y2 = x2+y2;
+                    xy = puntoNuevo.X()*puntoNuevo.Y();
+                    matrizGrande[0][0]+=x2y2*x2y2;
+                    matrizGrande[0][1]+=x2y2*puntoNuevo.X();
+                    matrizGrande[0][2]+=x2y2*puntoNuevo.Y();
+                    matrizGrande[1][1]+=x2;
+                    matrizGrande[1][2]+=xy;
+                    matrizGrande[2][2]+=y2;
+                    vectorDerecha[0]+=x2y2;
+                    vectorDerecha[1]+=puntoNuevo.X();
+                    vectorDerecha[2]+=puntoNuevo.Y();
+                }
+                matrizGrande[2][1] = matrizGrande[1][2];
+                matrizGrande[1][0] = matrizGrande[0][1];
+                matrizGrande[2][0] = matrizGrande[0][2];
+                matrizGrande = Inversa(matrizGrande);
+                matrizGrande[2][1] = matrizGrande[1][2];
+                matrizGrande[1][0] = matrizGrande[0][1];
+                matrizGrande[2][0] = matrizGrande[0][2];
+                vectorIzquierda = matrizGrande * vectorDerecha;
+                centro[i].Z() = puntoNuevo.Z();
+                centro[i].X() = (-vectorIzquierda[1])/(2*vectorIzquierda[0]);
+                centro[i].Y() = (-vectorIzquierda[2])/(2*vectorIzquierda[0]);
+                centro[i] = quaternionInverso.Rotate(centro[i]);
+           // }
         }
-    */
+    }
 
-    //}
-
-    //if(contador < 2) return -1;
     return 0;
 }
 
-bool GLArea::sonIguales(vcg::Point3f p1, vcg::Point3f p2){
-    vcg::Point3f error = p1-p2;
-    if(error.X() < 0) error.X() = -error.X();
-    if(error.Y() < 0) error.Y() = -error.Y();
-    if(error.Z() < 0) error.Z() = -error.Z();
-    if(error.Norm() < 0.0001) return true;
-    else return false;
+float GLArea::Determinante(float** mat, int tam){
+    if(tam == 2){
+        return mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+    }else if(tam == 3){
+        return mat[0][0]*mat[1][1]*mat[2][2] +
+               mat[1][0]*mat[2][1]*mat[0][2] +
+               mat[2][0]*mat[0][1]*mat[1][2] -
+               mat[2][1]*mat[1][1]*mat[0][2] -
+               mat[0][0]*mat[2][1]*mat[1][2] -
+               mat[1][0]*mat[0][1]*mat[2][2];
+    }else
+        return -1;
 }
+
+vcg::Matrix33f GLArea::Inversa(vcg::Matrix33f mat){
+    vcg::Matrix33f mat2;
+    float ** miniMatriz;
+    float ** maxiMatriz;
+    miniMatriz = new float*[2];
+    miniMatriz[0] = new float[2];
+    miniMatriz[1] = new float[2];
+    maxiMatriz = new float*[3];
+    for(int i=0; i<3; ++i){
+        maxiMatriz[i] = new float [3];
+        for(int j=0; j<3; ++j)
+            maxiMatriz[i][j] = mat[i][j];
+    }
+    miniMatriz[0][0] = mat[1][1];
+    miniMatriz[0][1] = mat[1][2];
+    miniMatriz[1][0] = mat[2][1];
+    miniMatriz[1][1] = mat[2][2];
+    mat2[0][0] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][2];
+    miniMatriz[0][1] = mat[0][1];
+    miniMatriz[1][0] = mat[2][2];
+    miniMatriz[1][1] = mat[2][1];
+    mat2[0][1] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][1];
+    miniMatriz[0][1] = mat[0][2];
+    miniMatriz[1][0] = mat[1][1];
+    miniMatriz[1][1] = mat[1][2];
+    mat2[0][2] = Determinante(miniMatriz,2);
+
+    miniMatriz[0][0] = mat[1][2];
+    miniMatriz[0][1] = mat[1][0];
+    miniMatriz[1][0] = mat[2][2];
+    miniMatriz[1][1] = mat[2][0];
+    mat2[1][0] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][0];
+    miniMatriz[0][1] = mat[0][2];
+    miniMatriz[1][0] = mat[2][0];
+    miniMatriz[1][1] = mat[2][2];
+    mat2[1][1] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][2];
+    miniMatriz[0][1] = mat[0][0];
+    miniMatriz[1][0] = mat[1][2];
+    miniMatriz[1][1] = mat[1][0];
+    mat2[1][2] = Determinante(miniMatriz,2);
+
+    miniMatriz[0][0] = mat[1][0];
+    miniMatriz[0][1] = mat[1][1];
+    miniMatriz[1][0] = mat[2][0];
+    miniMatriz[1][1] = mat[2][1];
+    mat2[2][0] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][1];
+    miniMatriz[0][1] = mat[0][0];
+    miniMatriz[1][0] = mat[2][1];
+    miniMatriz[1][1] = mat[2][0];
+    mat2[2][1] = Determinante(miniMatriz,2);
+    miniMatriz[0][0] = mat[0][0];
+    miniMatriz[0][1] = mat[0][1];
+    miniMatriz[1][0] = mat[1][0];
+    miniMatriz[1][1] = mat[1][1];
+    mat2[2][2] = Determinante(miniMatriz,2);
+
+    mat2 = mat2 * Determinante(maxiMatriz,3);
+    return mat2;
+}
+
+
 

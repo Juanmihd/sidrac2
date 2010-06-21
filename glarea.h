@@ -102,7 +102,8 @@ private:
   QMultiMap<int,Voxel> voxels;
   QList<Voxel> voxelsDentro;
   QList<Voxel> voxelsFuera;
-  QList<vcg::Point3f> puntosDibujar[2];
+  QList<vcg::Point3f> puntosDibujar[3];
+  bool* planoIntersecta;
   int *** voxels2;
   bool **** voxelsNormal;
   double nivelVoxels;
@@ -127,7 +128,7 @@ private:
   CMesh mallaEje;
   CEMesh * aristacas;
   bool* planosIntersecta;
-  vcg::Point3f * puntosCircuncentro;
+  vcg::Point3f * centro;
   vcg::Line3fN mallaEje2;
   /// the active mesh opengl wrapper
   vcg::GlTrimesh<CMesh> glWrap;
@@ -150,6 +151,7 @@ private:
   bool cambiaDibujo;
   bool piezaCargada;
   bool dibujarEje;
+  bool dibujarEjeDePrueba;
   bool dibujarVoxels;
   bool dibujarAristas;
   int numPlanos;
@@ -177,7 +179,8 @@ private:
   float Bezier3(float t, float P1, float P2, float P3);
   bool InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual);
   float calidadDelEje(float error, int numPlanos);
-  bool sonIguales(vcg::Point3f p1, vcg::Point3f p2);
+  float Determinante(float** mat, int tam);
+  vcg::Matrix33f Inversa(vcg::Matrix33f mat);
 
  };
 

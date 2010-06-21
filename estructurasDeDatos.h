@@ -33,6 +33,7 @@
 #include "lib/wrap/gui/trackball.h"
 #include "lib/vcg/complex/edgemesh/update/bounding.h"
 
+
 #include "voxel.h"
 
 /// declaring edge and face type
@@ -52,6 +53,7 @@ struct PuntoLista{
     vcg::Point3f punto;
     int posicionSiguiente;
 };
+
 
 
 #endif // ESTRUCTURASDEDATOS_H

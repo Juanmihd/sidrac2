@@ -5,6 +5,10 @@
 
 #include "estructurasDeDatos.h"
 
+#ifndef PI
+#define PI 3.141592
+#endif
+
 
 class hebraCalculoEje : public QThread
 {
@@ -68,6 +72,7 @@ private:
     vcg::GlTrimesh<CMesh> glWrap;
     QList<vcg::Line3f> normales;
     QMap<PuntoOrdenable,PuntoOrdenable> orientacionNormales;
+    int contadorNormales[360][360];
     int *** voxels2;
     int maxInterseccionVoxel;
     int anchoVoxels;

@@ -40,15 +40,15 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
     InicializarVoxels();
     voxels.clear();
     Voxel aux;
-    CMesh::FaceIterator fi=glWrap.m->face.begin();
+    CMesh::FaceIterator faceIterator=glWrap.m->face.begin();
     int numCaras = glWrap.m->face.size();
     vcg::Line3f nueva_normal;
     int contando = 0;
     int caraActual = 0;
-    while(fi!=glWrap.m->face.end()){
-        emit AvanzarBarra((int)(100.*caraActual/numCaras));
-        nueva_normal.SetOrigin(vcg::Barycenter(*fi));
-        nueva_normal.SetDirection(vcg::Normal(*fi).Normalize());
+    while(faceIterator!=glWrap.m->face.end()){
+        emit AvanzarBarra((int)(40.*caraActual/numCaras));
+        nueva_normal.SetOrigin(vcg::Barycenter(*faceIterator));
+        nueva_normal.SetDirection(vcg::Normal(*faceIterator).Normalize());
         normales.append(nueva_normal);
         orientacionNormales.insert(nueva_normal.Direction(),nueva_normal.Direction());
         fi = atan2(nueva_normal.Direction().X(),nueva_normal.Direction().Y());
@@ -61,33 +61,25 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
         fi = 180.*fi/PI;
         theta = theta+PI;
         theta = 180.*theta/PI;
-        //Incrementar orientacionNormales[alfa][beta]++
-        orientacionNormales[(int)theta][(int)fi]++;
-        if(orientacionNormales[(int)theta][(int)fi]>maximo)
-            maximo = orientacionNormales[(int)theta][(int)fi];
-            mTheta = (int) theta;
-            mFi = (int) fi;
-        }
-        ++fi;
+        //Incrementar orientacionNormales[alfa][beta]
+        contadorNormales[(int)theta][(int)fi]++;
+        ++faceIterator;
         ++contando;
         ++caraActual;
     }
+    emit setStatusBar(tr("Normales obtenidas"));
 
     caraActual = 0;
     foreach(vcg::Line3f normal, normales){
+        emit AvanzarBarra((int)(40+40.*caraActual/numCaras));
         ObtenerVoxelsNormal(normal,caraActual);
         caraActual++;
     }
-/*
-    foreach(PuntoOrdenable punto, orientacionNormales){
-        emit Imprimir("\n"+QString::number(punto.posicion.X())+"\t"+
-                      QString::number(punto.posicion.Y())+"\t"+
-                      QString::number(punto.posicion.Z()));
-    }
-*/
+
     vcg::Point3f punto;
     float dimension;
     maxInterseccionVoxel = 0;
+    int m , mMax = anchoVoxels*anchoVoxels*anchoVoxels;
     for(int i=0; i<anchoVoxels; ++i)
         for(int j=0; j<anchoVoxels; ++j)
             for(int k=0; k<anchoVoxels; ++k){
@@ -103,17 +95,18 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
                         if(dimension > amplitudMinima * distanciaMinima/2.)
                             voxels.insert(voxels2[i][j][k],aux);
                         if(aux.contador() >= maxInterseccionVoxel) maxInterseccionVoxel = aux.contador();
+                        emit AvanzarBarra((int)(80+20.*m/mMax));
+                        m++;
                     }
                 }
     emit AcabarBarra();
-    emit setStatusBar(tr("Normales obtenidas"));
+    emit setStatusBar(tr("Intersecciones calculadas."));
 }
 
 void hebraCalculoEje::InicializarVoxels(){
     BB = vcg::Point3f(glWrap.m->bbox.Dim() * 10);
     BBsmall = vcg::Point3f(glWrap.m->bbox.Dim());
     distanciaMinima = 0.5*glWrap.m->bbox.MinDim();
-    emit Imprimir("Distancia minima" + QString::number(distanciaMinima));
     posicionGlobal = glWrap.m->bbox.Center();
     nivelVoxels = 9;
     anchoVoxels = pow(2,nivelVoxels);
@@ -263,7 +256,7 @@ void hebraCalculoEje::RANSAC(){
         direccion.Y() = punto2.Y() - punto1.Y();
         direccion.Z() = punto2.Z() - punto1.Z();
         rectaPrueba.Set(punto1,direccion);
-        ComprobarDistancia(rectaPrueba,distancia,maxInterseccionVoxel*limiteVoxelesEje);
+        ComprobarDistancia(rectaPrueba,distancia,(int) maxInterseccionVoxel*limiteVoxelesEje);
         ++iteraciones;
         porcentaje = (1.*voxelsDentro.size()) / (1.*(voxelsDentro.size() + voxelsFuera.size()));
         if(porcentaje > porcentajeDeseado) seguir = false;
