@@ -369,7 +369,7 @@ void MainWindow::CrearConfiguracionEje(int * parametros){
 
 void MainWindow::on_BotonEje2_clicked()
 {
-    emit ui.statusbar->showMessage(tr("¡¡NO FUNCIONA!!"));
+    emit ui.glArea->reCalidadDelEje(0);
 }
 
 void MainWindow::on_BotonDibujar_clicked()

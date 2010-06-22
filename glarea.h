@@ -54,6 +54,7 @@ public slots:
   void ReAcabarBarra(){emit AcabarBarra();}
   void ResetStatusBar(QString message){emit setStatusBar(message);}
   void ReImprimir(QString message){emit Imprimir(message);}
+  float reCalidadDelEje(float error);
 signals:
   /// signal for setting the statusbar message
   void CrearConfiguracionEje(int *parametros);
@@ -102,8 +103,7 @@ private:
   QMultiMap<int,Voxel> voxels;
   QList<Voxel> voxelsDentro;
   QList<Voxel> voxelsFuera;
-  QList<vcg::Point3f> puntosDibujar[3];
-  bool* planoIntersecta;
+  QList<vcg::Point3f> * puntosDibujar;
   int *** voxels2;
   bool **** voxelsNormal;
   double nivelVoxels;
@@ -116,6 +116,7 @@ private:
   int filtroNormales;
   float anchoVoxels;
   float valorMedio;
+  float calidadAnterior;
   vcg::Point3f nodoRaiz;
   ejePlanos planoCorte;
   /// Mallas
@@ -129,6 +130,7 @@ private:
   CEMesh * aristacas;
   bool* planosIntersecta;
   vcg::Point3f * centro;
+  vcg::Point3f * nuevoCentro;
   vcg::Line3fN mallaEje2;
   /// the active mesh opengl wrapper
   vcg::GlTrimesh<CMesh> glWrap;
@@ -142,6 +144,7 @@ private:
   float errorEje;
   bool pintar;
   bool planoInterseccion;
+  bool noMejora;
   bool voxelesDibujando;
   bool ejeDibujando;
   bool modoDibujado;
@@ -178,7 +181,7 @@ private:
   void GenerarPiezaEntera(int n);
   float Bezier3(float t, float P1, float P2, float P3);
   bool InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual);
-  float calidadDelEje(float error, int numPlanos);
+  float calidadDelEje(float error);
   float Determinante(float** mat, int tam);
   vcg::Matrix33f Inversa(vcg::Matrix33f mat);
 

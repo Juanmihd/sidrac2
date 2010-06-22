@@ -396,26 +396,36 @@ void GLArea::paintGL ()
                 glEnable(GL_POINT_SMOOTH);
                 glDisable(GL_LIGHTING);
                 glPointSize(2);
-                for(int j=0; j<3; ++j){
-                    //if(planoIntersecta[j]){
-                        glBegin(GL_POINTS);
-                        for(int i=0; i<puntosDibujar[j].size(); ++i){
-                                glVertex3f(puntosDibujar[j].value(i).X(),puntosDibujar[j].value(i).Y(),puntosDibujar[j].value(i).Z());
-                        }
-                        glEnd();
-                    //}
+                for(int j=0; j<numPlanos; ++j){
+                    glBegin(GL_POINTS);
+                    for(int i=0; i<puntosDibujar[j].size(); ++i){
+                            glVertex3f(puntosDibujar[j].value(i).X(),puntosDibujar[j].value(i).Y(),puntosDibujar[j].value(i).Z());
+                    }
+                    glEnd();
                 }
                 glColor3f(0,1,0);
                 glPointSize(10);
                 glBegin(GL_POINTS);
-                glVertex3f(centro[0].X(),centro[0].Y(),centro[0].Z());
-                glVertex3f(centro[1].X(),centro[1].Y(),centro[1].Z());
+                for(int i=0; i< numPlanos; ++i)
+                    glVertex3f(centro[i].X(),centro[i].Y(),centro[i].Z());
                 glEnd();
                 glPointSize(1);
                 glDisable(GL_POINT_SMOOTH);
                 glBegin(GL_LINES);
-                glVertex3f(centro[0].X(),centro[0].Y(),centro[0].Z());
-                glVertex3f(centro[1].X(),centro[1].Y(),centro[1].Z());
+                for(int i=0; i< numPlanos; ++i)
+                    glVertex3f(centro[i].X(),centro[i].Y(),centro[i].Z());
+                glEnd();
+                glColor3f(0,0,1);
+                glPointSize(10);
+                glBegin(GL_POINTS);
+                for(int i=0; i< numPlanos; ++i)
+                    glVertex3f(nuevoCentro[i].X(),nuevoCentro[i].Y(),nuevoCentro[i].Z());
+                glEnd();
+                glPointSize(1);
+                glDisable(GL_POINT_SMOOTH);
+                glBegin(GL_LINES);
+                for(int i=0; i< numPlanos; ++i)
+                    glVertex3f(nuevoCentro[i].X(),nuevoCentro[i].Y(),nuevoCentro[i].Z());
                 glEnd();
                 glEnable(GL_LIGHTING);
             }
@@ -529,44 +539,7 @@ void GLArea::calcularEje(){
     parametros[3] = 50;
     parametros[4] = 1000;
     parametros[5] = 10;
-
-    CMesh::VertexIterator viM;
-    vcg::Point3f min, max, actual;
-    max.X() = max.Y() = max.Z() = 0;
-    min.X() = min.Y() = min.Z() = 0;
-    viM = mesh.vert.begin();
-    while(viM != mesh.vert.end()){
-        actual = viM->P();
-        if(max.X() < actual.X())
-            max.X() = actual.X();
-        else if(min.X() > actual.X())
-            min.X() = actual.X();
-        if(max.Y() < actual.Y())
-            max.Y() = actual.Y();
-        else if(min.Y() > actual.Y())
-            min.Y() = actual.Y();
-        if(max.Z() < actual.Z())
-            max.Z() = actual.Z();
-        else if(min.Z() > actual.Z())
-            min.Z() = actual.Z();
-        viM ++;
-    }
-    float minDelTo = max.X()-min.X(), maxDelTo = max.X()-min.X();
-    if(max.Y()-min.Y() < minDelTo)
-        minDelTo = max.Y()-min.Y();
-    if(max.Z()-min.Z() < minDelTo)
-        minDelTo = max.Z()-min.Z();
-    if(max.Y()-min.Y() > maxDelTo)
-        maxDelTo = max.Y()-min.Y();
-    if(max.Z()-min.Z() > maxDelTo)
-        maxDelTo = max.Z()-min.Z();
-
-    if(4*minDelTo <= maxDelTo)
-        parametros[6] = 5;
-    else if(2*minDelTo < maxDelTo)
-        parametros[6] = 3;
-    else
-        parametros[6] = 0;
+    parametros[6] = 0;
     emit CrearConfiguracionEje(parametros);
 }
 
@@ -1027,6 +1000,7 @@ void GLArea::continuarRANSAC(){
 }
 
 void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFinal, vcg::Point3f nodoRaizFinal, int maxInterseccionVoxelFinal, vcg::Line3f ejeFinalFinal){
+    float calidad;
     voxels = voxelsFinal;
     dibujarEje = parametrosCargados[8];
     if(dibujarEje) emit activaBotonEje();
@@ -1041,106 +1015,159 @@ void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFi
     valorColorVoxel = maxInterseccionVoxel - cantidadDeIntersecciones;
     valorColorVoxel = valorColorVoxel / 7;
     if(valorColorVoxel <= 0) valorColorVoxel = 1;
+    calidad = calidadDelEje(0);
+    calidadAnterior = calidad;
+    emit Imprimir("\nLa calidad del eje: " + QString::number(calidad));
+    if(calidad>=0){
+        dibujarAristas = true;
+        dibujarVoxels = false;
+    }
+    noMejora = false;
 
-    emit Imprimir("\nLa calidad del eje: " + QString::number(calidadDelEje(0,2)));
-    dibujarAristas = true;
 }
 
-float GLArea::calidadDelEje(float error, int numPlanos = 3){
-    vcg::Point3f puntoNuevo, puntoViejo;
+float GLArea::reCalidadDelEje(float error){
+    if(!noMejora){
+        float calidad;
+        vcg::Point3f origen = nuevoCentro[0];
+        vcg::Point3f destino = nuevoCentro[1]-nuevoCentro[0];
+        destino = destino.Normalize();
+        float producto = -origen.Z()/destino.Z();
+        origen = origen-destino*producto;
+        ejeFinal.Set(origen,destino);
+        calidad = calidadDelEje(error);
+        if(calidad > calidadAnterior){
+            ejeFinal.Set(ejeDePrueba.Origin(),ejeDePrueba.Direction());
+            noMejora = true;
+            emit setStatusBar(tr("Ya no puede seguir calculando, no mejora."));
+        }else{
+            calidadAnterior = calidad;
+        }
+        emit Imprimir("\nLa calidad del eje: " + QString::number(calidad));
+    }else
+        emit setStatusBar(tr("¡Que no mejora, he dicho!"));
+}
+
+float GLArea::calidadDelEje(float error){
+    ejeDePrueba.Set(ejeFinal.Origin(),ejeFinal.Direction());
+    numPlanos = 2;
+    vcg::Point3f puntoNuevo, puntoViejo, ejeRotacion;
     vcg::Plane3f plano;
+    delete [] aristacas;
+    delete [] centro;
+    delete [] puntosDibujar;
+    delete [] nuevoCentro;
     aristacas = new CEMesh [numPlanos];
+    centro = new vcg::Point3f [numPlanos];
+    nuevoCentro = new vcg::Point3f [numPlanos];
+    puntosDibujar = new QList<vcg::Point3f> [numPlanos];
     int contador = 0;
     CEMesh::EdgeIterator ei;
-    vcg::Quaternionf quaternion, quaternionInverso;
+    vcg::Quaternionf quaternion, quaternion2, quaternionInverso, quaternionInverso2;
     vcg::Matrix33f matrizGrande;
     vcg::Point3f vectorDerecha,vectorIzquierda;
-    float theta, fi;
+    float theta, errorAcumulado = 0;
+    bool planoExtraUsado = false;
 
- //   delete [] puntosDibujar;
- //   puntosDibujar = new QList<vcg::Point3f> [3];
-
-    planoIntersecta = new bool [3];
-    for(int i=0; i<3; ++i)
-        planoIntersecta[i] = false;
-    plano.Set(ejeFinal.Direction(),(-0.3 * diagonal));
+    plano.Set(ejeFinal.Direction(),(-0.2 * diagonal));
     if(InterseccionPlanoPieza(plano,0)){
         contador++;
-        planoIntersecta[0] = true;
+    }else{
+        planoExtraUsado = true;
+        plano.Set(ejeFinal.Direction(),(0 * diagonal));
+        if(InterseccionPlanoPieza(plano,0)){
+            contador++;
+        }
     }
-    plano.Set(ejeFinal.Direction(),(0 * diagonal));
+    plano.Set(ejeFinal.Direction(),(0.2 * diagonal));
     if(InterseccionPlanoPieza(plano,1)){
         contador++;
-        planoIntersecta[1] = true;
-    }
-    plano.Set(ejeFinal.Direction(),(0.3 * diagonal));
-    if(InterseccionPlanoPieza(plano,2)){
-        contador++;
-        planoIntersecta[2] = true;
-    }
-
-    if(contador >= 2){
-        float x2, y2, x2y2,xy;
-        for(int i=0; i<3; ++i){
-            vectorDerecha[i] = 0;
-            for(int j=0; j<3; ++j)
-                matrizGrande[i][j] = 0;
+    }else{
+        if(planoExtraUsado)
+            plano.Set(ejeFinal.Direction(),(0.1 * diagonal));
+        else
+            plano.Set(ejeFinal.Direction(),(0 * diagonal));
+        if(InterseccionPlanoPieza(plano,1)){
+            contador++;
+        }else{
+            plano.Set(ejeFinal.Direction(),(-0.1 * diagonal));
+            if(InterseccionPlanoPieza(plano,1)){
+                contador++;
+            }
         }
+    }
 
-        fi = atan2(ejeFinal.Direction().X(),ejeFinal.Direction().Y());
-        theta = sqrt(ejeFinal.Direction().X()*ejeFinal.Direction().X()+
-                    ejeFinal.Direction().Y()*ejeFinal.Direction().Y()+
-                    ejeFinal.Direction().Z()*ejeFinal.Direction().Z());
-        theta = ejeFinal.Direction().Z()/theta;
-        theta = theta<0?-acos(-theta):acos(theta);
-        //emit Imprimir("Tiene que girarse "+QString::number(theta)+" "+QString::number(fi));
-        quaternion.FromEulerAngles(-theta,-fi,0);
-        quaternionInverso.FromEulerAngles(theta,fi,0);
-        ejeDePrueba.Set(vcg::Point3f(0,0,0),quaternion.Rotate(ejeFinal.Direction()));
+    vcg::Point3f ejeX (1,0,0), aux;
+    ejeRotacion = ejeFinal.Direction()^ejeX;
+    vcg::Line3f lineaX;
+    lineaX.Set(vcg::Point3f(0,0,0),ejeX);
+    float a, b;
+    a = (ejeFinal.Direction() - vcg::ClosestPoint(lineaX,ejeFinal.Direction())).Norm();
+    b = ejeFinal.Direction().X();
+    theta = atan2(a,b);
+    quaternion.FromAxis(theta,ejeRotacion);
+    quaternionInverso.FromAxis(-theta,ejeRotacion);
+
+    emit Imprimir("\nIntersecta :" + QString::number(contador) + "\n");
+
+    float x2, y2, x2y2,xy;
+    for(int i=0; i<3; ++i){
+        vectorDerecha[i] = 0;
+        for(int j=0; j<3; ++j)
+            matrizGrande[i][j] = 0;
+    }
+
+    aux = quaternion.Rotate(ejeFinal.Direction());
+    //dibujarEjeDePrueba = true;
+    if(contador > 1){
         for(int i=0; i<numPlanos; ++i){
-            //if(planoIntersecta[i]){
-                for(int k=0; k<3; ++k){
-                    vectorDerecha[k] = 0;
-                    for(int j=0; j<3; ++j)
-                        matrizGrande[k][j] = 0;
-                }
-                ei = aristacas[i].edges.begin();
-                while(ei!=aristacas[i].edges.end()){
-                    puntoNuevo = ei->P(0);
-                    puntosDibujar[i].append(puntoNuevo);
-                    puntoNuevo = quaternion.Rotate(puntoNuevo);
-                    ei++;
-                    x2 = puntoNuevo.X()*puntoNuevo.X();
-                    y2 = puntoNuevo.Y()*puntoNuevo.Y();
-                    x2y2 = x2+y2;
-                    xy = puntoNuevo.X()*puntoNuevo.Y();
-                    matrizGrande[0][0]+=x2y2*x2y2;
-                    matrizGrande[0][1]+=x2y2*puntoNuevo.X();
-                    matrizGrande[0][2]+=x2y2*puntoNuevo.Y();
-                    matrizGrande[1][1]+=x2;
-                    matrizGrande[1][2]+=xy;
-                    matrizGrande[2][2]+=y2;
-                    vectorDerecha[0]+=x2y2;
-                    vectorDerecha[1]+=puntoNuevo.X();
-                    vectorDerecha[2]+=puntoNuevo.Y();
-                }
-                matrizGrande[2][1] = matrizGrande[1][2];
-                matrizGrande[1][0] = matrizGrande[0][1];
-                matrizGrande[2][0] = matrizGrande[0][2];
-                matrizGrande = Inversa(matrizGrande);
-                matrizGrande[2][1] = matrizGrande[1][2];
-                matrizGrande[1][0] = matrizGrande[0][1];
-                matrizGrande[2][0] = matrizGrande[0][2];
-                vectorIzquierda = matrizGrande * vectorDerecha;
-                centro[i].Z() = puntoNuevo.Z();
-                centro[i].X() = (-vectorIzquierda[1])/(2*vectorIzquierda[0]);
-                centro[i].Y() = (-vectorIzquierda[2])/(2*vectorIzquierda[0]);
-                centro[i] = quaternionInverso.Rotate(centro[i]);
-           // }
+            for(int k=0; k<3; ++k){
+                vectorDerecha[k] = 0;
+                for(int j=0; j<3; ++j)
+                    matrizGrande[k][j] = 0;
+            }
+            ei = aristacas[i].edges.begin();
+            while(ei!=aristacas[i].edges.end()){
+                puntoNuevo = ei->P(0);
+                ei++;
+                puntosDibujar[i].append(puntoNuevo);
+                puntoNuevo = quaternion.Rotate(puntoNuevo);
+                //emit Imprimir("\n" + QString::number(puntoNuevo.X()) + " " + QString::number(puntoNuevo.Y()) + " " + QString::number(puntoNuevo.Z()));
+                x2 = puntoNuevo.Z()*puntoNuevo.Z();
+                y2 = puntoNuevo.Y()*puntoNuevo.Y();
+                x2y2 = x2+y2;
+                xy = puntoNuevo.Z()*puntoNuevo.Y();
+                matrizGrande[0][0]+=x2y2*x2y2;
+                matrizGrande[0][1]+=x2y2*puntoNuevo.Z();
+                matrizGrande[0][2]+=x2y2*puntoNuevo.Y();
+                matrizGrande[1][1]+=x2;
+                matrizGrande[1][2]+=xy;
+                matrizGrande[2][2]+=y2;
+                vectorDerecha[0]+=x2y2;
+                vectorDerecha[1]+=puntoNuevo.Z();
+                vectorDerecha[2]+=puntoNuevo.Y();
+            }
+            matrizGrande[2][1] = matrizGrande[1][2];
+            matrizGrande[1][0] = matrizGrande[0][1];
+            matrizGrande[2][0] = matrizGrande[0][2];
+            matrizGrande = Inversa(matrizGrande);
+            matrizGrande[2][1] = matrizGrande[1][2];
+            matrizGrande[1][0] = matrizGrande[0][1];
+            matrizGrande[2][0] = matrizGrande[0][2];
+            vectorIzquierda = matrizGrande * vectorDerecha;
+            ei = aristacas[i].edges.begin();
+            centro[i].X() = puntoNuevo.X();
+            centro[i].Z() = (-vectorIzquierda[1])/(2*vectorIzquierda[0]);
+            centro[i].Y() = (-vectorIzquierda[2])/(2*vectorIzquierda[0]);
+            centro[i] = quaternionInverso.Rotate(centro[i]);
+            nuevoCentro[i] = vcg::ClosestPoint(ejeFinal,centro[i]);
+            errorAcumulado = errorAcumulado + 1.*(nuevoCentro[i]-centro[i]).Norm();
+            nuevoCentro[i] = centro[i] + (nuevoCentro[i]-centro[i])/2;
         }
-    }
+    }else
+        return -1;
 
-    return 0;
+    return 1.*errorAcumulado;
 }
 
 float GLArea::Determinante(float** mat, int tam){
