@@ -1,6 +1,7 @@
 #ifndef PUNTOCONTORNO_H
 #define PUNTOCONTORNO_H
 
+#include "estructurasDeDatos.h"
 #include "vcg/space/point3.h"
 
 
@@ -9,6 +10,8 @@ class puntoContorno
 public:
     puntoContorno();
     puntoContorno(vcg::Point3f posicion0, int numPunto0, float altura0);
+    float altura;
+    float distancia;
     vcg::Point3f getPosicion(){return posicion;}
     int getNumPunto(){return numPunto;}
     float getAltura(){return altura;}
@@ -26,10 +29,9 @@ public:
 private:
     vcg::Point3f posicion;
     int numPunto;
-    float altura;
-    float distancia;
 };
 
+void GrahamScan(QList<PuntoContornoLight> &puntos);
 
 
 #endif // PUNTOCONTORNO_H

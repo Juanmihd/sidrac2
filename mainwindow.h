@@ -69,6 +69,7 @@ private:
   QTextStream * out;
   QTextStream * out2;
 private slots:
+    void on_BotonInvertir_clicked();
     void activaBotonEje();
     void activaBotonVoxels();
     void on_BotonDibujarEje_clicked();
@@ -105,7 +106,7 @@ private slots:
     void AvanzarBarra(int valor);
     void AcabarBarra();
     void obtenerPorDefecto();
-    void inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje);
+    void inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje);
 };
 
 #endif /*MAINWINDOW_H_ */

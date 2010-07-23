@@ -1,4 +1,4 @@
-#include "hebracalculoeje.h"
+    #include "hebracalculoeje.h"
 
 hebraCalculoEje::hebraCalculoEje(QObject *parent)
 : QThread(parent)
@@ -24,6 +24,10 @@ void hebraCalculoEje::insertarDatos(vcg::GlTrimesh<CMesh> glWrap2){
     glWrap = glWrap2;
 }
 
+void hebraCalculoEje::insertarVoxels(QMultiMap<int,Voxel> voxelsInicial){
+    voxels = voxelsInicial;
+}
+
 void hebraCalculoEje::inicializarEje(){
     if(calculoVoxels){
         ObtenerEjeSinNormales();
@@ -36,6 +40,7 @@ void hebraCalculoEje::inicializarEje(){
 
 void hebraCalculoEje::ObtenerEjeSinNormales(){
     emit IniciarBarra();
+    float thetaActual, fiActual;
     float theta, fi;
     InicializarVoxels();
     voxels.clear();
@@ -45,8 +50,9 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
     vcg::Line3f nueva_normal;
     int contando = 0;
     int caraActual = 0;
+    int maxContador = -1;
     while(faceIterator!=glWrap.m->face.end()){
-        emit AvanzarBarra((int)(40.*caraActual/numCaras));
+        emit AvanzarBarra((int)(30.*caraActual/numCaras));
         nueva_normal.SetOrigin(vcg::Barycenter(*faceIterator));
         nueva_normal.SetDirection(vcg::Normal(*faceIterator).Normalize());
         normales.append(nueva_normal);
@@ -63,19 +69,46 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
         theta = 180.*theta/PI;
         //Incrementar orientacionNormales[alfa][beta]
         contadorNormales[(int)theta][(int)fi]++;
+        if(contadorNormales[(int)theta][(int)fi] > maxContador){
+            maxContador = contadorNormales[(int)theta][(int)fi];
+            thetaGlobal = (int) theta;
+            fiGlobal = (int) fi;
+        }
         ++faceIterator;
         ++contando;
         ++caraActual;
     }
-    emit setStatusBar(tr("Normales obtenidas"));
+    emit setStatusBar(tr("Normales recorridas"));
+
+    contarClusterEje = (maxContador > 20);
 
     caraActual = 0;
-    foreach(vcg::Line3f normal, normales){
-        emit AvanzarBarra((int)(40+40.*caraActual/numCaras));
-        ObtenerVoxelsNormal(normal,caraActual);
-        caraActual++;
-    }
+    if(contarClusterEje){
+        foreach(vcg::Line3f normal, normales){
+            emit AvanzarBarra((int)(30+50.*caraActual/numCaras));
+            fiActual = atan2(normal.Direction().X(),normal.Direction().Y());
+            thetaActual = sqrt(normal.Direction().X()*normal.Direction().X()+
+                        normal.Direction().Y()*normal.Direction().Y()+
+                        normal.Direction().Z()*normal.Direction().Z());
+            thetaActual = normal.Direction().Z()/thetaActual;
+            thetaActual = thetaActual<0?-acos(-thetaActual):acos(thetaActual);
+            fiActual = fiActual+PI;
+            fiActual = (int) (180.*fiActual/PI);
+            thetaActual = thetaActual+PI;
+            thetaActual = (int) (180.*thetaActual/PI);
+            if(!(fiActual == fiGlobal && thetaActual == thetaGlobal))
+                ObtenerVoxelsNormal(normal,caraActual);
+            caraActual++;
+        }
+    }else
+        foreach(vcg::Line3f normal, normales){
+            emit AvanzarBarra((int)(30+50.*caraActual/numCaras));
+            ObtenerVoxelsNormal(normal,caraActual);
+            caraActual++;
+        }
 
+
+    emit setStatusBar(tr("Normales calculadas"));
     vcg::Point3f punto;
     float dimension;
     maxInterseccionVoxel = 0;
@@ -135,6 +168,10 @@ void hebraCalculoEje::InicializarVoxels(){
             }
         }
     }
+    for(int i=0; i< 360; ++i)
+        for(int j=0; j< 360; ++j)
+            contadorNormales[i][j]=0;
+
     antiguoTamanioVoxel = (int) anchoVoxels;
 }
 
@@ -238,7 +275,8 @@ void hebraCalculoEje::ObtenerVoxelsNormal(vcg::Line3f normal, int caraActual){
 
 
 void hebraCalculoEje::RANSAC(){
-    emit Imprimir(tr("\nREALIZANDO RANSAC\n"));
+    inicializarSemilla();
+  //  emit Imprimir("\nRealizando Ransac " + QString::number(porcentajeDeseado));
     int iteraciones = 0;
     float porcentaje, distancia;
     distancia =  amplitudVoxels*sqrt(nodoRaiz.X()*nodoRaiz.X()+
@@ -251,18 +289,23 @@ void hebraCalculoEje::RANSAC(){
     emit IniciarBarra();
     while(iteraciones < limiteIteraciones && seguir){
         emit AvanzarBarra((int)(100.*iteraciones/limiteIteraciones));
-        SeleccionaPuntos(punto1,punto2);
+        if(contarClusterEje)
+            SeleccionaPuntosCluster(punto1,punto2);
+        else
+            SeleccionaPuntos(punto1,punto2);
         direccion.X() = punto2.X() - punto1.X();
         direccion.Y() = punto2.Y() - punto1.Y();
         direccion.Z() = punto2.Z() - punto1.Z();
         rectaPrueba.Set(punto1,direccion);
-        ComprobarDistancia(rectaPrueba,distancia,(int) maxInterseccionVoxel*limiteVoxelesEje);
+        ComprobarDistancia(rectaPrueba,distancia,(int) maxInterseccionVoxel*(limiteVoxelesEje-10));
         ++iteraciones;
         porcentaje = (1.*voxelsDentro.size()) / (1.*(voxelsDentro.size() + voxelsFuera.size()));
         if(porcentaje > porcentajeDeseado) seguir = false;
+        emit Imprimir("\t" + QString::number(porcentaje));
     }
     ejeFinal.Set(punto1,direccion);
 
+    //emit Imprimir(tr("\nACABANDO RANSAC"));
     emit setStatusBar(tr("Eje calculado, para seguir ejecutando RANSAC pulse CONTINUAR."));
     emit AcabarBarra();
 }
@@ -272,7 +315,6 @@ void hebraCalculoEje::SeleccionaPuntos(vcg::Point3f &punto1, vcg::Point3f & punt
     int seleccionado1, seleccionado2 = (int) seleccion2*voxels.size();
     QMultiMap<int,Voxel>::iterator it1,it2;
 
-    seleccion1 = 1.*qrand()/RAND_MAX;
     seleccionado1 = (int)(maxInterseccionVoxel*limiteVoxelesIntermedio + (seleccion1*(maxInterseccionVoxel*(1-limiteVoxelesIntermedio))));
     it1 = voxels.upperBound(seleccionado1);
     punto1.X() = (it1->posicion.X() - valorMedio)*nodoRaiz.X();
@@ -289,22 +331,41 @@ void hebraCalculoEje::SeleccionaPuntos(vcg::Point3f &punto1, vcg::Point3f & punt
     punto2.X() = (it2->posicion.X() - valorMedio)*nodoRaiz.X();
     punto2.Y() = (it2->posicion.Y() - valorMedio)*nodoRaiz.Y();
     punto2.Z() = (it2->posicion.Z() - valorMedio)*nodoRaiz.Z();
+   // emit Imprimir("\nPuntos seleccionados: " + QString::number(seleccion1) + " " + QString::number(seleccion2));
+   // emit Imprimir("\nPuntos seleccionados: " + QString::number(seleccionado1) + " " + QString::number(seleccionado2));
+   // emit Imprimir("\nPuntos seleccionados: " + QString::number(it1->posicion.X()) + " " + QString::number(it2->posicion.X()));
+   // emit Imprimir("\nPuntos seleccionados: " + QString::number(it1->posicion.Y()) + " " + QString::number(it2->posicion.Y()));
+   // emit Imprimir("\nPuntos seleccionados: " + QString::number(it1->posicion.Z()) + " " + QString::number(it2->posicion.Z()));
+   // emit Imprimir(tr("\n"));
+}
 
-    vcg::Point3f direccionProbada = (punto2 - punto1).Normalize();
+void hebraCalculoEje::SeleccionaPuntosCluster(vcg::Point3f &punto1, vcg::Point3f & punto2){
+    float seleccion1 = 1.*qrand()/RAND_MAX;
+    int seleccionado1;
+    float fi = fiGlobal, theta = thetaGlobal;
+    QMultiMap<int,Voxel>::iterator it1;
 
-    QMap<PuntoOrdenable,PuntoOrdenable>::iterator itD,itD2;
-    itD = orientacionNormales.lowerBound(direccionProbada);
-    itD2 = orientacionNormales.upperBound(direccionProbada);
+    seleccion1 = 1.*qrand()/RAND_MAX;
+    seleccionado1 = (int)(maxInterseccionVoxel*limiteVoxelesIntermedio + (seleccion1*(maxInterseccionVoxel*(1-limiteVoxelesIntermedio))));
+    it1 = voxels.upperBound(seleccionado1);
+    punto1.X() = (it1->posicion.X() - valorMedio)*nodoRaiz.X();
+    punto1.Y() = (it1->posicion.Y() - valorMedio)*nodoRaiz.Y();
+    punto1.Z() = (it1->posicion.Z() - valorMedio)*nodoRaiz.Z();
 
-    emit Imprimir("\nDireccion probada: \n" +
-                  QString::number(direccionProbada.X()) + "\t" +
-                  QString::number(direccionProbada.Y()) + "\t" +
-                  QString::number(direccionProbada.Z()));
+    vcg::Point3f direccion;
+    fi = PI*fi/180.;
+    fi = fi - PI;
+    theta = PI*theta/180.;
+    theta = theta + PI/2.;
+    direccion.X() = sin(vcg::math::ToRad(fi))*cos(vcg::math::ToRad(theta));
+    direccion.Y() = sin(vcg::math::ToRad(fi))*cos(vcg::math::ToRad(theta));
+    direccion.Z() = cos(vcg::math::ToRad(fi));
+    punto2 = punto1 + direccion;
 }
 
 float hebraCalculoEje::ComprobarDistancia(vcg::Line3f rectaPrueba, float distanciaMaxima, int filtro){
     float dist;
-    vcg::Point3f puntoAux,puntoAux2;
+    vcg::Point3f puntoAux;
     voxelsDentro.clear();
     voxelsFuera.clear();
     int num=0;
@@ -321,16 +382,10 @@ float hebraCalculoEje::ComprobarDistancia(vcg::Line3f rectaPrueba, float distanc
                 voxelsDentro.append(voxel);
             else
                 voxelsFuera.append(voxel);
-            if(num<10){
-                puntoAux2 = vcg::ClosestPoint<float>(rectaPrueba,puntoAux);
-            }
         }
     }
     return distanciaMedia /= num;
 }
-
-
-
 
 void hebraCalculoEje::run(){
     if(operacion == 0)

@@ -5,6 +5,7 @@
 /// Opengl related imports
 #include <GL/glew.h>
 #include <QtOpenGL/QGLWidget>
+#include <QTime>
 
 /// vcg imports
 #include "lib/vcg/simplex/vertex/base.h"
@@ -54,6 +55,18 @@ struct PuntoLista{
     int posicionSiguiente;
 };
 
+struct PuntoContornoLight{
+    float distancia;
+    float altura;
+    float angulo;
+    float dist2;
+    bool operator< (PuntoContornoLight p1) const{return (angulo < p1.angulo || (angulo == p1.angulo && dist2 < p1.dist2));}
+    bool operator<=(PuntoContornoLight p1) const{return ((angulo < p1.angulo || (angulo == p1.angulo && dist2 < p1.dist2)) || (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2));}
+    bool operator> (PuntoContornoLight p1) const{return (angulo > p1.angulo || (angulo == p1.angulo && dist2 > p1.dist2));}
+    bool operator>=(PuntoContornoLight p1) const{return ((angulo > p1.angulo || (angulo == p1.angulo && dist2 > p1.dist2)) || (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2));}
+    bool operator!=(PuntoContornoLight p1) const{return (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2);}
+    bool operator==(PuntoContornoLight p1) const{return (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2);}
+};
 
 
 #endif // ESTRUCTURASDEDATOS_H

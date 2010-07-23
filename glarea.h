@@ -37,7 +37,7 @@ public slots:
   void continuarRANSAC();
   void dibujaPlano();
   void cargarPlano();
-  void inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje);
+  void inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje);
   void cambiaModoDibujado(){modoDibujado = !modoDibujado;updateGL();}
   void dibujaNormales();
   void cambiaValor(int valor);
@@ -54,7 +54,10 @@ public slots:
   void ReAcabarBarra(){emit AcabarBarra();}
   void ResetStatusBar(QString message){emit setStatusBar(message);}
   void ReImprimir(QString message){emit Imprimir(message);}
-  float reCalidadDelEje(float error);
+  float reCalidadDelEje(int genetico);
+  void invertirEje(){
+      ejeFinal.Set(ejeFinal.Direction()+ejeFinal.Origin(),ejeFinal.Direction()*(-1));
+  }
 signals:
   /// signal for setting the statusbar message
   void CrearConfiguracionEje(int *parametros);
@@ -91,10 +94,12 @@ private:
   vcg::Point3f posicionGlobal;
   QMap<puntoContorno,puntoContorno> contornoOrdenado;
   QList<puntoContorno> contorno;
+  QMultiMap<float, puntoContorno> contornoAlturas;
   QList<CMesh::FacePointer> carasSeleccionadas;
   int numPuntoContorno;
   int numCaras;
   puntoContorno puntoAlto;
+  puntoContorno puntoBajo;
   vcg::Box3f caja;
   int maxInterseccionVoxel;
   int valorColorVoxel;
@@ -106,6 +111,7 @@ private:
   QList<vcg::Point3f> * puntosDibujar;
   int *** voxels2;
   bool **** voxelsNormal;
+  bool botonIzquierdo;
   double nivelVoxels;
   float diagonal;
   int numNormales;
@@ -129,6 +135,7 @@ private:
   CMesh mallaEje;
   CEMesh * aristacas;
   bool* planosIntersecta;
+  bool realizarGenetico;
   vcg::Point3f * centro;
   vcg::Point3f * nuevoCentro;
   vcg::Line3fN mallaEje2;
@@ -181,9 +188,11 @@ private:
   void GenerarPiezaEntera(int n);
   float Bezier3(float t, float P1, float P2, float P3);
   bool InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual);
-  float calidadDelEje(float error);
+  float calidadDelEje();
   float Determinante(float** mat, int tam);
   vcg::Matrix33f Inversa(vcg::Matrix33f mat);
+  void GeneticoRefinaEje();
+  void ObtenerPlanosCorte();
 
  };
 

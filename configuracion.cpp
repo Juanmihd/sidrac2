@@ -5,8 +5,8 @@ Configuracion::Configuracion(QWidget *parent, int * parametros) :
     QDialog(parent),
     m_ui(new Ui::Configuracion)
 {
-    connect (this, SIGNAL (inicializarEje(int,int,int,int,int,int,int,bool,bool)),
-           parent, SLOT (inicializarEje(int,int,int,int,int,int,int,bool,bool)));
+    connect (this, SIGNAL (inicializarEje(int,int,int,int,int,int,int,bool,bool,bool)),
+           parent, SLOT (inicializarEje(int,int,int,int,int,int,int,bool,bool,bool)));
     connect (this, SIGNAL (obtenerPorDefecto()),
              parent, SLOT (obtenerPorDefecto()));
 
@@ -55,7 +55,8 @@ void Configuracion::on_buttonBox_accepted()
                         m_ui->amplitud->text().toInt(),
                         m_ui->amplitudMin->text().toInt(),
                         m_ui->calcularVoxels->isChecked(),
-                        m_ui->calcularEje->isChecked());
+                        m_ui->calcularEje->isChecked(),
+                        m_ui->refinarEje->isChecked());
 }
 
 void Configuracion::porDefecto(int * parametrosDefecto){

@@ -156,7 +156,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,0">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,0,0">
          <item>
           <widget class="QLabel" name="etiquetaPrincipal">
            <property name="maximumSize">
@@ -189,6 +189,13 @@
            </property>
            <property name="mouseTracking">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="GLArea" name="glContorno" native="true">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -348,13 +355,13 @@ p, li { white-space: pre-wrap; }
    <property name="minimumSize">
     <size>
      <width>120</width>
-     <height>370</height>
+     <height>380</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>120</width>
-     <height>370</height>
+     <height>380</height>
     </size>
    </property>
    <property name="palette">
@@ -441,7 +448,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>20</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -454,7 +461,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -467,7 +474,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>200</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -480,7 +487,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>280</y>
+       <y>290</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -489,18 +496,46 @@ p, li { white-space: pre-wrap; }
       <string>SALIR</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="FijarPrograma">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>2</y>
+       <width>15</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="MenuVisualizacion">
    <property name="minimumSize">
     <size>
-     <width>770</width>
+     <width>780</width>
      <height>120</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>770</width>
+     <width>780</width>
      <height>120</height>
     </size>
    </property>
@@ -526,7 +561,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -548,7 +583,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -567,7 +602,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QToolButton" name="BotonPantallaCompleta">
      <property name="geometry">
       <rect>
-       <x>680</x>
+       <x>690</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -584,7 +619,7 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>500</x>
+       <x>510</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -606,7 +641,7 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>600</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -625,7 +660,7 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>110</x>
        <y>10</y>
        <width>81</width>
        <height>81</height>
@@ -638,7 +673,7 @@ COMPLETA</string>
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QSlider" name="sliderVoxeles">
@@ -647,7 +682,7 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>210</x>
        <y>60</y>
        <width>191</width>
        <height>21</height>
@@ -669,7 +704,7 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>220</x>
        <y>21</y>
        <width>111</width>
        <height>31</height>
@@ -683,7 +718,7 @@ nº de intersecciones:</string>
     <widget class="QLabel" name="etiquetaNumVoxeles">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>340</x>
        <y>30</y>
        <width>46</width>
        <height>20</height>
@@ -693,19 +728,47 @@ nº de intersecciones:</string>
       <string/>
      </property>
     </widget>
+    <widget class="QPushButton" name="FijarVisualizacion">
+     <property name="geometry">
+      <rect>
+       <x>2</x>
+       <y>2</y>
+       <width>15</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="MenuInteractuar">
    <property name="minimumSize">
     <size>
      <width>120</width>
-     <height>570</height>
+     <height>600</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>120</width>
-     <height>570</height>
+     <height>600</height>
     </size>
    </property>
    <property name="layoutDirection">
@@ -731,7 +794,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>280</y>
+       <y>290</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -750,7 +813,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>370</y>
+       <y>380</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -769,7 +832,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>460</y>
+       <y>470</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -788,7 +851,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>550</y>
+       <y>560</y>
        <width>72</width>
        <height>18</height>
       </rect>
@@ -801,7 +864,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>20</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -817,7 +880,7 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>81</width>
        <height>81</height>
       </rect>
@@ -830,14 +893,70 @@ nº de intersecciones:</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>200</y>
        <width>81</width>
-       <height>81</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
-      <string>NO 
- FUNCIONA!</string>
+      <string>RECALIDAD</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="step">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>580</y>
+       <width>72</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>step</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonInvertir">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>81</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>INVERTIR EJE</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="FijarConstruccion">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>2</y>
+       <width>15</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

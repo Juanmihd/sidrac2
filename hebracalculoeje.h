@@ -16,9 +16,15 @@ class hebraCalculoEje : public QThread
 public:
     hebraCalculoEje(QObject *parent);
     void inicializarEje();
+    void inicializarSemilla(){
+        int time = QTime::currentTime().second();
+        qsrand(time);
+        emit Imprimir("\nSemilla inicializada con : " + QString::number(time));
+    }
     void setOperacion(int i){operacion = i;}
     void setParametros(int * parametros);
     void insertarDatos(vcg::GlTrimesh<CMesh> glWrap2);
+    void insertarVoxels(QMultiMap<int,Voxel> voxelsInicial);
 
 signals:
     void finalizaHebra(QMultiMap<int,Voxel> voxelsFinal,
@@ -42,6 +48,7 @@ private:
     void InicializarVoxels();
     void RANSAC();
     void SeleccionaPuntos(vcg::Point3f &punto1, vcg::Point3f & punto2);
+    void SeleccionaPuntosCluster(vcg::Point3f &punto1, vcg::Point3f & punto2);
     float ComprobarDistancia(vcg::Line3f recta, float distancia, int filtro);
     void ObtenerVoxelsNormal(vcg::Line3f normal, int CaraActual);
     bool MuyParecidos(vcg::Point3f p1, vcg::Point3f p2, float error){
@@ -65,8 +72,11 @@ private:
     int amplitudVoxels;
     int amplitudMinima;
     float distanciaMinima;
+    bool contarClusterEje;
     bool calculoVoxels;
     bool calculoEje;
+    float thetaGlobal;
+    float fiGlobal;
 
     //Variables internas para el calculo del eje
     vcg::GlTrimesh<CMesh> glWrap;

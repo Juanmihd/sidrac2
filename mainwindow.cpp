@@ -22,7 +22,6 @@ MainWindow::MainWindow (QWidget * parent):QMainWindow (parent)
   parametrosConfiguracion[7] = 1;
   parametrosConfiguracion[8] = 0;
     //inicializar semilla para probar cosas
-  qsrand(10);
   salida = new QFile("depurando.txt");
   salida->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
   out = new QTextStream(salida);
@@ -96,32 +95,33 @@ MainWindow::MainWindow (QWidget * parent):QMainWindow (parent)
 
   connect(this, SIGNAL (cancelarSalir()),
           ui.glArea, SLOT(cancelarSalir()));
-  emit ui.MenuPrincipal->setHidden(true);
-  emit ui.MenuVisualizacion->setHidden(true);
-  emit ui.MenuInteractuar->setHidden(true);
+  ui.MenuPrincipal->setHidden(true);
+  ui.MenuVisualizacion->setHidden(true);
+  ui.MenuInteractuar->setHidden(true);
   ui.barraProgreso->setHidden(true);
+  ui.glContorno->setHidden(true);
 }
 
 
 
 void MainWindow::on_actionPuntos_activated()
 {
-  emit cambioModo(1);
+  emit cambioModo(0);
 }
 
 void MainWindow::on_actionAristas_activated()
 {
-  emit cambioModo(2);
+  emit cambioModo(1);
 }
 
 void MainWindow::on_actionAristas_y_caras_planas_activated()
 {
-  emit cambioModo(3);
+  emit cambioModo(6);
 }
 
 void MainWindow::on_actionCaras_suavizadas_activated()
 {
-  emit cambioModo(0);
+  emit cambioModo(4);
 }
 
 void MainWindow::on_actionCaras_planas_activated()
@@ -131,7 +131,7 @@ void MainWindow::on_actionCaras_planas_activated()
 
 void MainWindow::on_actionAristas_ocultas_activated()
 {
-  emit cambioModo(4);
+  emit cambioModo(3);
 }
 
 void MainWindow::on_actionAcerca_de_activated()
@@ -271,7 +271,7 @@ void MainWindow::mouseMoveEvent (QMouseEvent * e)
           }
 
       }else{
-          if(!(posy < 110)){
+          if(!(posy < 110) & !ui.FijarPrograma->isChecked()){
             emit ui.MenuPrincipal->setHidden(true);
             emit ui.etiquetaPrincipal->setHidden(false);
             activado = true;
@@ -285,7 +285,7 @@ void MainWindow::mouseMoveEvent (QMouseEvent * e)
                   activado = true;
               }
           }else{
-              if(!(posx2 < 110)){
+              if(!(posx2 < 110) && !ui.FijarVisualizacion->isChecked()){
                   ui.MenuVisualizacion->setHidden(true);
                   ui.etiquetaVisualizacion->setHidden(false);
                   activado = true;
@@ -299,7 +299,7 @@ void MainWindow::mouseMoveEvent (QMouseEvent * e)
                   emit ui.MenuInteractuar->setHidden(false);
                   activado = true;
               }
-          }else if(!(posy2 <110)){
+          }else if(!(posy2 <110) && !ui.FijarConstruccion->isChecked()){
                   emit ui.MenuInteractuar->setHidden(true);
                   emit ui.etiquetaInteractuar->setHidden(false);
                   activado = true;
@@ -308,12 +308,18 @@ void MainWindow::mouseMoveEvent (QMouseEvent * e)
   }
 
 void MainWindow::CierraMenus(){
-    emit ui.MenuInteractuar->setHidden(true);
-    emit ui.etiquetaInteractuar->setHidden(false);
-    emit ui.MenuPrincipal->setHidden(true);
-    emit ui.etiquetaPrincipal->setHidden(false);
-    emit ui.MenuVisualizacion->setHidden(true);
-    emit ui.etiquetaVisualizacion->setHidden(false);
+    if(!ui.FijarConstruccion->isChecked()){
+        emit ui.MenuInteractuar->setHidden(true);
+        emit ui.etiquetaInteractuar->setHidden(false);
+    }
+    if(!ui.FijarPrograma->isChecked()){
+        emit ui.MenuPrincipal->setHidden(true);
+        emit ui.etiquetaPrincipal->setHidden(false);
+    }
+    if(!ui.FijarVisualizacion->isChecked()){
+        emit ui.MenuVisualizacion->setHidden(true);
+        emit ui.etiquetaVisualizacion->setHidden(false);
+    }
 }
 
 void MainWindow::on_BotonPantallaCompleta_clicked()
@@ -369,7 +375,8 @@ void MainWindow::CrearConfiguracionEje(int * parametros){
 
 void MainWindow::on_BotonEje2_clicked()
 {
-    emit ui.glArea->reCalidadDelEje(0);
+    //emit ui.glArea->reCalidadDelEje(ui.step->isChecked());
+    emit ui.glArea->reCalidadDelEje(1);
 }
 
 void MainWindow::on_BotonDibujar_clicked()
@@ -393,9 +400,9 @@ void MainWindow::on_BotonNormales_clicked()
 void MainWindow::on_BotonContorno_clicked()
 {
     if(ui.BotonContorno->isChecked())
-        ui.glArea->setCursor(QCursor(Qt::SizeAllCursor));
-    else
         ui.glArea->setCursor(QCursor(Qt::CrossCursor));
+    else
+        ui.glArea->setCursor(QCursor(Qt::SizeAllCursor));
     emit ui.glArea->seleccionar();
 }
 
@@ -421,7 +428,7 @@ void MainWindow::on_BotonGenerar_clicked()
     emit ui.glArea->Generar(ui.generarInferior->isChecked());
 }
 
-void MainWindow::inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje){
+void MainWindow::inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje){
       parametrosConfiguracion[0] = limInf;
       parametrosConfiguracion[1] = limIntermedio;
       parametrosConfiguracion[2] = porcentaje;
@@ -437,9 +444,10 @@ void MainWindow::inicializarEje(int limInf, int limIntermedio, int porcentaje, i
     ui.BotonReset->setEnabled(true);
     ui.BotonGenerar->setEnabled(true);
     ui.generarInferior->setEnabled(true);
+    ui.BotonDibujarVoxels->setEnabled(true);
     ui.sliderVoxeles->setEnabled(true);
     ui.tituloSliderVoxeles->setEnabled(true);
-      emit ui.glArea->inicializarEje(limInf,limIntermedio,porcentaje,limiteIntersec,limiteIteracion,amplitud,amplitudMin,calcularVoxels,calcularEje);
+    emit ui.glArea->inicializarEje(limInf,limIntermedio,porcentaje,limiteIntersec,limiteIteracion,amplitud,amplitudMin,calcularVoxels,calcularEje,refinarEje);
 }
 
 void MainWindow::on_sliderVoxeles_sliderMoved(int position)
@@ -478,4 +486,10 @@ void MainWindow::activaBotonEje(){
 
 void MainWindow::activaBotonVoxels(){
     ui.BotonDibujarVoxels->setEnabled(true);
+    ui.sliderVoxeles->setEnabled(true);
+}
+
+void MainWindow::on_BotonInvertir_clicked()
+{
+    emit ui.glArea->invertirEje();
 }
