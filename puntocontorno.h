@@ -33,5 +33,6 @@ private:
 
 void GrahamScan(QList<PuntoContornoLight> &puntos);
 
+float DireccionProductoVectorial(PuntoContornoLight p1, PuntoContornoLight p2, PuntoContornoLight p3);
 
 #endif // PUNTOCONTORNO_H

@@ -5,8 +5,8 @@ LANGUAGE = C++
 # QT modules
 QT += opengl
 CONFIG += thread
-# CONFIG += console
 
+# CONFIG += console
 # Executable name
 TARGET = SIDRAC2
 
@@ -23,10 +23,9 @@ INCLUDEPATH += lib
 # Lib sources
 SOURCES += lib/wrap/ply/plylib.cpp \
     voxel.cpp \
-    ejeplanos.cpp \
-    puntocontorno.cpp \
     configuracion.cpp \
-    hebracalculoeje.cpp
+    hebracalculoeje.cpp \
+    puntocontorno.cpp
 SOURCES += lib/wrap/gui/trackball.cpp
 SOURCES += lib/wrap/gui/trackmode.cpp
 
@@ -41,7 +40,6 @@ win32:DEFINES += NOMINMAX
 # Input
 HEADERS += mainwindow.h \
     voxel.h \
-    ejeplanos.h \
     puntocontorno.h \
     configuracion.h \
     estructurasDeDatos.h \

@@ -6,7 +6,6 @@
 #define GLAREA_H_
 
 #include "estructurasDeDatos.h"
-#include "ejeplanos.h"
 #include "puntocontorno.h"
 #include "hebracalculoeje.h"
 
@@ -93,8 +92,10 @@ private:
   vcg::Point3f BBsmall;
   vcg::Point3f posicionGlobal;
   QMap<puntoContorno,puntoContorno> contornoOrdenado;
+  QList<PuntoContornoLight> puntosGrahamOrdenados;
+  QList<PuntoContornoLight> puntosObtenidos;
   QList<puntoContorno> contorno;
-  QMultiMap<float, puntoContorno> contornoAlturas;
+  QMap<float, puntoContorno> contornoAlturas;
   QList<CMesh::FacePointer> carasSeleccionadas;
   int numPuntoContorno;
   int numCaras;
@@ -124,7 +125,6 @@ private:
   float valorMedio;
   float calidadAnterior;
   vcg::Point3f nodoRaiz;
-  ejePlanos planoCorte;
   /// Mallas
   CMesh mesh;
   CMesh mesh2;

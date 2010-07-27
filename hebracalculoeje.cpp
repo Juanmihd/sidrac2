@@ -301,7 +301,7 @@ void hebraCalculoEje::RANSAC(){
         ++iteraciones;
         porcentaje = (1.*voxelsDentro.size()) / (1.*(voxelsDentro.size() + voxelsFuera.size()));
         if(porcentaje > porcentajeDeseado) seguir = false;
-        emit Imprimir("\t" + QString::number(porcentaje));
+       // emit Imprimir("\t" + QString::number(porcentaje));
     }
     ejeFinal.Set(punto1,direccion);
 

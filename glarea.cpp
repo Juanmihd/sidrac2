@@ -299,17 +299,32 @@ void GLArea::paintGL ()
             glRotatef(90,1,0,0);
             glTranslatef(0,-ejeFinal.Origin().Y(),0);
             
-             //Dibujar el contorno cutre
-            glColor3f(0,1,0);
-            glBegin(GL_LINE_STRIP);
-                foreach(puntoContorno puntoActual, contornoOrdenado){
-                    glPushMatrix();
-                    glVertex3f(puntoActual.getDistancia()*cos(0),
-                               puntoActual.getAltura(),
-                               puntoActual.getDistancia()*sin(0));
-                    glPopMatrix();
+            //Dibujar el contorno cutre
+            glDisable(GL_LIGHTING);
+                glPointSize(3);
+            glColor3f(1,0.4,0.4);
+            glBegin(GL_POINTS);
+                    glVertex3f(puntosObtenidos.at(0).distancia*cos(0),
+                               puntosObtenidos.at(0).altura,
+                               puntosObtenidos.at(0).distancia*sin(0));
+            glEnd();
+            glColor3f(0.4,1,0.4);
+            glBegin(GL_POINTS);
+                for(int i=1; i<puntosObtenidos.size(); ++i){
+                    glVertex3f(puntosObtenidos.at(i).distancia*cos(0),
+                               puntosObtenidos.at(i).altura,
+                               puntosObtenidos.at(i).distancia*sin(0));
                 }
             glEnd();
+            glColor3f(0.4,1,0.4);
+            glBegin(GL_LINE_STRIP);
+                foreach(PuntoContornoLight puntoActual, puntosObtenidos){
+                    glVertex3f(puntoActual.distancia*cos(0),
+                               puntoActual.altura,
+                               puntoActual.distancia*sin(0));
+                }
+            glEnd();
+            glEnable(GL_LIGHTING);
             glPopMatrix();
         }else{ //Dibujar ANTES de reconstruir
             if(planoInterseccion) //Dibujar plano de prueba
@@ -695,23 +710,86 @@ void GLArea::seleccionar(){
 void GLArea::CalcularContorno(bool entera){
 
     int numPuntos, numPuntos2, numElementos;
-    float alturaAlta = puntoAlto.getAltura(), alturaBaja = puntoBajo.getAltura(), saltoAltura = (alturaAlta - alturaBaja)/20., altura;
+    float alturaAlta = puntoAlto.getAltura(), alturaBaja = puntoBajo.getAltura(), saltoAltura = (alturaAlta - alturaBaja)/10., altura;
     float distanciaMin, distanciaMax, distancia;
     puntoContorno punto1, punto2;
     vcg::Point3f puntoEje = vcg::ClosestPoint(ejeFinal,puntoAlto.getPosicion());
     contornoOrdenado.clear();
-    QMultiMap<float, PuntoContornoLight> puntosLaterales;
+    QMap<float, PuntoContornoLight> puntosLaterales;
     PuntoContornoLight puntoInsertando;
     QList<PuntoContornoLight> listaLaterales;
-    QList<PuntoContornoLight> puntosGrahamOrdenados;
     QList<float> listaAlturas;
-    QMultiMap<float, float> puntosAlturas;
-    QMultiMap<float, puntoContorno>::iterator itAlturas;
+    QMap<float, float> puntosAlturas;
+    QMap<float, puntoContorno>::iterator itAlturas;
     puntoContorno puntoNuevo;
     int contandito = 0, contadorPuntos = 0;
+    foreach(puntoContorno punto, contornoAlturas){
+        puntoInsertando.altura = punto.altura - alturaBaja;
+        puntoInsertando.distancia = punto.distancia;
+        puntosObtenidos.append(puntoInsertando);
+      //  emit Imprimir("\n Altura: "+QString::number(punto.altura));
+    }
+    alturaAlta -= alturaBaja;
+    alturaBaja = 0;
+    //emit Imprimir("\n AlturaBaja: "+QString::number(alturaBaja) + " AlturaAlta: "+QString::number(alturaAlta)+ " SaltoAltura: "+QString::number(saltoAltura));
+
+    emit Imprimir("\n Imprimiendo valores");
+
+    foreach(PuntoContornoLight punto, puntosObtenidos)
+        emit Imprimir("\n" + QString::number(punto.altura) + "\t" + QString::number(punto.distancia));
+
+
+    GrahamScan(puntosObtenidos);
+
+    emit Imprimir("\n Imprimiendo valores");
+
+    foreach(PuntoContornoLight punto, puntosObtenidos)
+        emit Imprimir("\n" + QString::number(punto.altura) + "\t" + QString::number(punto.distancia));
+
+
+    QList<PuntoContornoLight> puntos;
+    PuntoContornoLight p0;
+    puntos.append(puntosObtenidos);
+    int m = 1;
+    int i = 2;
+    while(i<puntos.size()){
+        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
+                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
+                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
+                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
+                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
+        while(m >= 1 && DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i]) < 0){
+        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
+                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
+                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
+                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
+                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
+            m--;
+        }
+        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
+                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
+                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
+                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
+                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
+        m++;
+        p0 = puntos[m];
+        puntos.replace(m,puntos[i]);
+        puntos.replace(i,p0);
+        i++;
+    }
+
+    puntosObtenidos.clear();
+    for(int i=0; i<m; ++i)
+        puntosObtenidos.append(puntos.at(i));
+
+
+    /*
+
+
+
+
     for(float altura = alturaBaja; altura <= alturaAlta; altura+=saltoAltura){
         puntosLaterales.clear();
-        emit Imprimir("\n Numero " + QString::number(contandito) + "\n");
         contandito++;
         itAlturas = contornoAlturas.begin();
         distanciaMin = 100000;
@@ -731,9 +809,7 @@ void GLArea::CalcularContorno(bool entera){
             itAlturas = contornoAlturas.erase(itAlturas);
             numElementos ++;
         }
-            emit Imprimir("\nDistancia min: " + QString::number(distanciaMin));
-            emit Imprimir("\nDistancia max: " + QString::number(distanciaMax));
-            emit Imprimir("\nNum elementos: " + QString::number(numElementos) + "\n");
+            emit Imprimir("Num elementos: " + QString::number(numElementos) + "\n");
             listaLaterales = puntosLaterales.values();
         if(numElementos == 1){
             puntosGrahamOrdenados.append(puntoInsertando);
@@ -741,9 +817,12 @@ void GLArea::CalcularContorno(bool entera){
             puntosGrahamOrdenados.append(listaLaterales);
         }else if(numElementos > 2){
             distancia = distanciaMin + (distanciaMax-distanciaMin)/2.;
+            foreach(PuntoContornoLight punto, listaLaterales){
+                emit Imprimir("\n" + QString::number(punto.distancia));
+            }
             numPuntos = 0;
             puntosAlturas.clear();
-            for(numPuntos = 0; listaLaterales.at(numPuntos).distancia < distancia;++numPuntos){
+            /*for(numPuntos = 0; listaLaterales.at(numPuntos).distancia < distancia && numPuntos < listaLaterales.size();++numPuntos){
                 puntosAlturas.insertMulti(listaLaterales.at(numPuntos).altura ,listaLaterales.at(numPuntos).altura);
             }
             listaAlturas = puntosAlturas.values();
@@ -757,14 +836,22 @@ void GLArea::CalcularContorno(bool entera){
             listaAlturas = puntosAlturas.values();
             puntoInsertando.distancia = listaAlturas.at(numPuntos + (int) numPuntos2/2);
             puntoInsertando.altura = listaAlturas.at((int) numPuntos2/2);
-            puntosGrahamOrdenados.append(puntoInsertando);
+            puntosGrahamOrdenados.append(puntoInsertando);*/
+
+
+
+
+            /*
+
+
+
         }
     }
     emit Imprimir ("\nTamanio de esta cosa\n" + QString::number(puntosGrahamOrdenados.size()) + "\n");
 
     //ALGORITMO GRAHAM
      //Obtiene el p0 que es el punto que tiene menos altura y tambien el que esta más cerca del eje
-
+    //GrahamScan(puntosGrahamOrdenados);
     /*
     foreach(puntoContorno punto,contorno){
         punto.setNumPunto(-contador);
@@ -773,7 +860,7 @@ void GLArea::CalcularContorno(bool entera){
         punto.setDistancia(vcg::Distance(ejeFinal,punto.getPosicion()));
         contornoOrdenado.insert(punto,punto);
     }
-*/
+
     /*
     if(entera)
         GenerarPiezaEntera(50);

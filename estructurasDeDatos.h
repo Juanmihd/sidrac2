@@ -1,3 +1,14 @@
+/**
+  * En este archivo se encuentran la mayoria de los "includes" relacionados con la vcgLib para
+  * tenerlos todos localizados en el mismo archivo y evitar duplicados.
+  * Tambien estan aqui almacenadas
+  * las estructuras de datos creadas con la vcgLib de vertices, aristas, caras y mallas, tanto para la
+  * visualizacion entera de una malla de caras, como de una malla de aristas unicamente.
+  * Además tambien estan en este
+  * archivo hay dos estructuras de datos, una de ellas de una lista de puntos (minivectores de 3 parametros)
+  * y un punto para el contorno, con varios parametros y con las funciones necesarias para poder usado en un "Map" o "MultiMap"
+  */
+
 #ifndef ESTRUCTURASDEDATOS_H
 #define ESTRUCTURASDEDATOS_H
 

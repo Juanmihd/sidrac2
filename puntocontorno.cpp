@@ -114,8 +114,8 @@ bool puntoContorno::operator==(puntoContorno p1) const{
 
 void GrahamScan(QList<PuntoContornoLight> &puntos){
     PuntoContornoLight p0;
-    QMultiMap<PuntoContornoLight,PuntoContornoLight> puntosOrdenados;
-    int i, posMin;
+    QMap<PuntoContornoLight,PuntoContornoLight> puntosOrdenados;
+    int i, m, posMin = 0;
     float cat, alt;
     //Seleccionar el punto con menor altura y mas cerca del eje
     for(i=0; i<puntos.size(); ++i)
@@ -126,24 +126,30 @@ void GrahamScan(QList<PuntoContornoLight> &puntos){
     //se hace que ese punto este en el primer lugar
     p0.altura = puntos.at(0).altura;
     p0.distancia = puntos.at(0).distancia;
-    puntos[0].altura = puntos.at(posMin).altura;
-    puntos[0].distancia = puntos.at(posMin).distancia;
-    puntos[posMin].altura = p0.altura;
-    puntos[posMin].distancia = p0.distancia;
+    puntos.replace(0,puntos.at(posMin));
+    puntos.replace(posMin,p0);
     //Se ordenan el resto de puntos segun el angulo
+
     for(i=1; i<puntos.size(); ++i){
         cat = puntos[i].distancia - p0.distancia;
         alt = puntos[i].altura - p0.altura;
         puntos[i].angulo = atan2(alt,cat);
         puntos[i].dist2 = sqrt(cat*cat + alt*alt);
-        puntosOrdenados.insertMulti(puntos[i],puntos[i]);
+        puntosOrdenados.insert(puntos[i],puntos[i]);
     }
     puntos.clear();
     puntos.append(p0);
     puntos.append(puntosOrdenados.values());
-    for(i=0; i<puntos.size(); ++i){
 
-    }
+    //Ahora se van cogiendo puntos de tres en tres para poder probar su direccion, si giran a la izquierda o a la derecha
+
+/*
+    for(i = puntos.size()-1; i>=m; --i)
+        puntos.removeAt(m);
+*/
+}
 
 
+float DireccionProductoVectorial(PuntoContornoLight p1, PuntoContornoLight p2, PuntoContornoLight p3){
+    return (p2.distancia - p1.distancia)*(p3.altura - p1.altura) - (p2.altura - p1.altura)*(p3.distancia - p1.distancia);
 }
