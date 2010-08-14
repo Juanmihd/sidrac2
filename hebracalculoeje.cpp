@@ -392,9 +392,14 @@ void hebraCalculoEje::run(){
         inicializarEje();
     if(operacion == 1)
         RANSAC();
+    emit Imprimir("\n¡¡¡PERO ESTO QUE ES!!!!" + QString::number(operacion));
+
     emit finalizaHebra(voxels,
                        valorMedio,
                        nodoRaiz,
                        maxInterseccionVoxel,
                        ejeFinal);
+
+
+    emit Imprimir("\n¡¡¡PERO ESTO QUE ES!!!! x 2");
 }

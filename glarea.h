@@ -103,6 +103,7 @@ private:
   puntoContorno puntoBajo;
   vcg::Box3f caja;
   int maxInterseccionVoxel;
+  int estadoDelCalculo;
   int valorColorVoxel;
   int **orientacionNormales;
   int tamanioOrientacionNormales;
@@ -189,11 +190,12 @@ private:
   float Bezier3(float t, float P1, float P2, float P3);
   bool InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual);
   float calidadDelEje();
-  float Determinante(float** mat, int tam);
-  vcg::Matrix33f Inversa(vcg::Matrix33f mat);
   void GeneticoRefinaEje();
   void ObtenerPlanosCorte();
+  float * ajusteCirculo(QList<vcg::Point3f> conjuntoPuntos);
 
+
+void GrahamScan(QList<PuntoContornoLight> &puntos);
  };
 
 

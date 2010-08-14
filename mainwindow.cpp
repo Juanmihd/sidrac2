@@ -425,6 +425,9 @@ void MainWindow::on_BotonReset_clicked()
 
 void MainWindow::on_BotonGenerar_clicked()
 {
+    ui.BotonContorno->setChecked(false);
+    ui.glArea->setCursor(QCursor(Qt::SizeAllCursor));
+    emit ui.glArea->seleccionar();
     emit ui.glArea->Generar(ui.generarInferior->isChecked());
 }
 

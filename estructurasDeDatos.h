@@ -48,15 +48,23 @@
 
 #include "voxel.h"
 
-/// declaring edge and face type
+/**
+  * Pre-declaracion de las clases "CEdge" arista y "CFace" cara.
+  * Se utilizarán para la declaración del resto de elementos
+  *
+  */
 class CEdge;
 class CFace;
 
-/// compositing wanted proprieties
+/// Declaracion de la clase vertice, se hace uso de vertice, arista, cara, coordenadas, normales, color, y algunos bit extra
 class CVertex : public vcg::VertexSimp2< CVertex, CEdge, CFace, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b, vcg::vertex::BitFlags>{};
+/// Declaracion de la clase arista, usando verice y arista simplemente
 class CEdge   : public vcg::EdgeSimp1 < CVertex, CEdge, vcg::edge::VertexRef> {};
+/// Declaracion de la clase Cara, usando vertice, arista ,cara, referencia del vertice, normal, color, y algunos bit extra
 class CFace   : public vcg::FaceSimp2<   CVertex, CEdge, CFace, vcg::face::VertexRef, vcg::face::Normal3f, vcg::face::Color4b, vcg::face::BitFlags > {};
+/// Declaracion de la clase malla, usando un vector de vertices y otro de caras
 class CMesh   : public vcg::tri::TriMesh< std::vector<CVertex>, std::vector<CFace> > {};
+/// Declaracion de la clase malla de aristas, usando un vector de vertices y otro de aristas
 class CEMesh  : public vcg::edg::EdgeMesh< std::vector<CVertex>, std::vector<CEdge> > {};
 
 typedef vcg::GridStaticPtr<CMesh::FaceType,CMesh::ScalarType> TriMeshGrid;

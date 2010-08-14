@@ -74,6 +74,7 @@ GLArea::GLArea (QWidget * parent)
 void GLArea::ResetearPieza(){
     botonIzquierdo = false;
     puntoAlto.setAltura(-100000000);
+    estadoDelCalculo = -1;
     antiguoTamanioVoxel = -1;
     drawmode= SMOOTH;
     cantidadDeIntersecciones = 1;
@@ -324,6 +325,25 @@ void GLArea::paintGL ()
                                puntoActual.distancia*sin(0));
                 }
             glEnd();
+            glColor3f(0.4,1,0.4);
+            glBegin(GL_LINE_STRIP);
+                foreach(PuntoContornoLight puntoActual, puntosGrahamOrdenados){
+                    glVertex3f(puntoActual.distancia*cos(0),
+                               1 + puntoActual.altura,
+                               puntoActual.distancia*sin(0));
+                }
+            glEnd();
+            glColor3f(0.4,0.4,1);
+            glBegin(GL_LINES);
+                foreach(PuntoContornoLight puntoActual, puntosObtenidos){
+                    glVertex3f(puntosObtenidos.at(0).distancia*cos(0),
+                               puntosObtenidos.at(0).altura,
+                               2 + puntosObtenidos.at(0).distancia*sin(0));
+                    glVertex3f(puntoActual.distancia*cos(0),
+                               puntoActual.altura,
+                               2 + puntoActual.distancia*sin(0));
+                }
+            glEnd();
             glEnable(GL_LIGHTING);
             glPopMatrix();
         }else{ //Dibujar ANTES de reconstruir
@@ -523,11 +543,17 @@ void GLArea::mousePressEvent (QMouseEvent * e)
 {
   e->accept ();
   setFocus ();
-  if(seleccionarActivado && e->buttons()&Qt::LeftButton){
+  if(seleccionarActivado){
+        if(e->buttons()&Qt::RightButton){
+            track.MouseDown (e->x (), height () - e->y (), QT2VCG (Qt::LeftButton, e->modifiers ()));
+            botonIzquierdo = false;
+        }else{
             clickado(e->x(), height() - e->y());
-        botonIzquierdo = true;
+            botonIzquierdo = true;
+        }
   }else
         track.MouseDown (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
+
   updateGL ();
 }
 
@@ -535,7 +561,10 @@ void GLArea::mouseMoveEvent (QMouseEvent * e)
 {
   if (e->buttons ()) {
       if(seleccionarActivado)
-        clickado(e->x(), height() - e->y());
+        if(botonIzquierdo)
+            clickado(e->x(), height() - e->y());
+        else
+            track.MouseMove(e->x (), height () - e->y ());
       else
         track.MouseMove (e->x (), height () - e->y ());
     updateGL ();
@@ -548,10 +577,12 @@ void GLArea::mouseReleaseEvent (QMouseEvent * e)
 {
 
   if(seleccionarActivado)
-    clickado(e->x(), height() - e->y());
+    if(botonIzquierdo)
+        clickado(e->x(), height() - e->y());
+    else
+        track.MouseUp (e->x (), height () - e->y (), QT2VCG (Qt::LeftButton, e->modifiers ()));
   else
     track.MouseUp (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
-  botonIzquierdo = false;
   updateGL ();
 }
 
@@ -651,7 +682,7 @@ void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int l
             direccionFinal.Y() = sin(vcg::math::ToRad((float)mFi))*cos(vcg::math::ToRad((float)mTheta));
             direccionFinal.Z() = cos(vcg::math::ToRad((float)mFi));
             ejeFinal.Set(vcg::Point3f(0,0,0),direccionFinal);
-            dibujarEje = true;
+            //dibujarEje = true;
         }
     }else if(!calcularVoxels && !calcularEje){
         calidadDelEje();
@@ -664,7 +695,7 @@ void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int l
             hebra->insertarDatos(glWrap);
             if(!calcularVoxels)
                 hebra->insertarVoxels(voxels);
-
+            estadoDelCalculo = 0;
             hebra->start();
         }
     }
@@ -721,18 +752,22 @@ void GLArea::CalcularContorno(bool entera){
     QList<float> listaAlturas;
     QMap<float, float> puntosAlturas;
     QMap<float, puntoContorno>::iterator itAlturas;
+    QList<PuntoContornoLight>::iterator itPuntos;
     puntoContorno puntoNuevo;
     int contandito = 0, contadorPuntos = 0;
     foreach(puntoContorno punto, contornoAlturas){
         puntoInsertando.altura = punto.altura - alturaBaja;
         puntoInsertando.distancia = punto.distancia;
         puntosObtenidos.append(puntoInsertando);
-      //  emit Imprimir("\n Altura: "+QString::number(punto.altura));
+       // emit Imprimir("\n Altura: "+QString::number(puntoInsertando.altura));
     }
     alturaAlta -= alturaBaja;
     alturaBaja = 0;
-    //emit Imprimir("\n AlturaBaja: "+QString::number(alturaBaja) + " AlturaAlta: "+QString::number(alturaAlta)+ " SaltoAltura: "+QString::number(saltoAltura));
+    puntosGrahamOrdenados = puntosObtenidos;
+    GrahamScan(puntosObtenidos);
 
+    //emit Imprimir("\n AlturaBaja: "+QString::number(alturaBaja) + " AlturaAlta: "+QString::number(alturaAlta)+ " SaltoAltura: "+QString::number(saltoAltura));
+/*
     emit Imprimir("\n Imprimiendo valores");
 
     foreach(PuntoContornoLight punto, puntosObtenidos)
@@ -782,12 +817,9 @@ void GLArea::CalcularContorno(bool entera){
     for(int i=0; i<m; ++i)
         puntosObtenidos.append(puntos.at(i));
 
+    emit Imprimir ("\nTamanio de esta cosa\n" + QString::number(puntosGrahamOrdenados.size()) + "\n");
 
-    /*
-
-
-
-
+/*
     for(float altura = alturaBaja; altura <= alturaAlta; altura+=saltoAltura){
         puntosLaterales.clear();
         contandito++;
@@ -822,7 +854,7 @@ void GLArea::CalcularContorno(bool entera){
             }
             numPuntos = 0;
             puntosAlturas.clear();
-            /*for(numPuntos = 0; listaLaterales.at(numPuntos).distancia < distancia && numPuntos < listaLaterales.size();++numPuntos){
+            for(numPuntos = 0; listaLaterales.at(numPuntos).distancia < distancia && numPuntos < listaLaterales.size();++numPuntos){
                 puntosAlturas.insertMulti(listaLaterales.at(numPuntos).altura ,listaLaterales.at(numPuntos).altura);
             }
             listaAlturas = puntosAlturas.values();
@@ -836,31 +868,10 @@ void GLArea::CalcularContorno(bool entera){
             listaAlturas = puntosAlturas.values();
             puntoInsertando.distancia = listaAlturas.at(numPuntos + (int) numPuntos2/2);
             puntoInsertando.altura = listaAlturas.at((int) numPuntos2/2);
-            puntosGrahamOrdenados.append(puntoInsertando);*/
-
-
-
-
-            /*
-
-
-
+            puntosGrahamOrdenados.append(puntoInsertando);
         }
     }
-    emit Imprimir ("\nTamanio de esta cosa\n" + QString::number(puntosGrahamOrdenados.size()) + "\n");
-
-    //ALGORITMO GRAHAM
-     //Obtiene el p0 que es el punto que tiene menos altura y tambien el que esta más cerca del eje
-    //GrahamScan(puntosGrahamOrdenados);
-    /*
-    foreach(puntoContorno punto,contorno){
-        punto.setNumPunto(-contador);
-        punto.setAltura(punto.getAltura() - alturaAlta);
-        contador--;
-        punto.setDistancia(vcg::Distance(ejeFinal,punto.getPosicion()));
-        contornoOrdenado.insert(punto,punto);
-    }
-
+*/
     /*
     if(entera)
         GenerarPiezaEntera(50);
@@ -1209,6 +1220,9 @@ void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFi
     nodoRaiz = nodoRaizFinal;
     maxInterseccionVoxel = maxInterseccionVoxelFinal;
     ejeFinal = ejeFinalFinal;
+    while(ejeFinal.Direction().Norm() < 1){
+        ejeFinal.Direction()*10;
+    }
     emit ajustarMaximoVoxeles(maxInterseccionVoxel);
     valorColorVoxel = maxInterseccionVoxel - cantidadDeIntersecciones;
     valorColorVoxel = valorColorVoxel / 7;
@@ -1218,12 +1232,12 @@ void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFi
     else
         calidad = -1;
     calidadAnterior = calidad;
-    emit Imprimir("\nLa calidad del eje: " + QString::number(calidad));
+    emit Imprimir("\nLa calidad del eje: " + QString::number(calidad) + " y el tamanio del mismo " + QString::number(ejeFinal.Direction().Norm()));
     if(calidad>=0){
         dibujarAristas = true;
     }
     noMejora = false;
-
+    estadoDelCalculo = 1;
 }
 
 void GLArea::GeneticoRefinaEje(){
@@ -1375,11 +1389,12 @@ float GLArea::calidadDelEje(){
     centro = new vcg::Point3f [numPlanos];
     nuevoCentro = new vcg::Point3f [numPlanos];
     puntosDibujar = new QList<vcg::Point3f> [numPlanos];
+    QList<vcg::Point3f> puntosDibujarG;
     CEMesh::EdgeIterator ei;
     vcg::Quaternionf quaternion, quaternion2, quaternionInverso, quaternionInverso2;
     vcg::Matrix33f matrizGrande;
     vcg::Point3f vectorDerecha,vectorIzquierda;
-    float theta, errorAcumulado = 0;
+    float a, b, theta, errorAcumulado = 0, * resultado;
 
     ObtenerPlanosCorte();
 
@@ -1387,19 +1402,11 @@ float GLArea::calidadDelEje(){
     ejeRotacion = ejeFinal.Direction()^ejeX;
     vcg::Line3f lineaX;
     lineaX.Set(vcg::Point3f(0,0,0),ejeX);
-    float a, b, maxDist = -1, minDist = 10000,dist;
     a = (ejeFinal.Direction() - vcg::ClosestPoint(lineaX,ejeFinal.Direction())).Norm();
     b = ejeFinal.Direction().X();
     theta = atan2(a,b);
     quaternion.FromAxis(theta,ejeRotacion);
     quaternionInverso.FromAxis(-theta,ejeRotacion);
-
-    float x2, y2, x2y2,xy;
-    for(int i=0; i<3; ++i){
-        vectorDerecha[i] = 0;
-        for(int j=0; j<3; ++j)
-            matrizGrande[i][j] = 0;
-    }
 
     aux = quaternion.Rotate(ejeFinal.Direction());
     //dibujarEjeDePrueba = true;
@@ -1412,8 +1419,6 @@ float GLArea::calidadDelEje(){
             ei++;
             puntosOrdenadosDistancia.insert((puntoNuevo - vcg::ClosestPoint(ejeFinal,puntoNuevo)).Norm(),puntoNuevo);
         }
-        //nuevoCentro[i] = centro[i] + (nuevoCentro[i]-centro[i])/2;
-        puntosDibujar[i].clear();
         contar = puntosOrdenadosDistancia.size()/2. -1;
         it = puntosOrdenadosDistancia.begin();
         while(contar > 0){
@@ -1421,34 +1426,18 @@ float GLArea::calidadDelEje(){
             contar--;
         }
         puntosDibujar[i] = puntosOrdenadosDistancia.values();
-        for(int k=0; k<3; ++k){
-            vectorDerecha[k] = 0;
-            for(int j=0; j<3; ++j)
-                matrizGrande[k][j] = 0;
+        emit Imprimir("\nComo va esto? " + QString::number(puntosOrdenadosDistancia.size()));
+        puntosDibujarG.clear();
+        foreach(vcg::Point3f punto, puntosDibujar[i]){
+            puntoNuevo = quaternion.Rotate(punto);
+            puntosDibujarG.append(puntoNuevo);
         }
-        foreach(vcg::Point3f puntoActual, puntosDibujar[i]){x2 = puntoNuevo.Z()*puntoNuevo.Z();
-                puntoNuevo = quaternion.Rotate(puntoActual);
-                y2 = puntoNuevo.Y()*puntoNuevo.Y();
-                x2y2 = x2+y2;
-                xy = puntoNuevo.Z()*puntoNuevo.Y();
-                matrizGrande[0][0]+=x2y2*x2y2;
-                matrizGrande[0][1]+=x2y2*puntoNuevo.Z();
-                matrizGrande[0][2]+=x2y2*puntoNuevo.Y();
-                matrizGrande[1][1]+=x2;
-                matrizGrande[1][2]+=xy;
-                matrizGrande[2][2]+=y2;
-                vectorDerecha[0]+=x2y2;
-                vectorDerecha[1]+=puntoNuevo.Z();
-                vectorDerecha[2]+=puntoNuevo.Y();
-        }
-        matrizGrande[2][1] = matrizGrande[1][2];
-        matrizGrande[1][0] = matrizGrande[0][1];
-        matrizGrande[2][0] = matrizGrande[0][2];
-        matrizGrande = Inversa(matrizGrande);
-        vectorIzquierda = matrizGrande * vectorDerecha;
+
+        resultado = ajusteCirculo(puntosDibujarG);
+
         centro[i].X() = puntoNuevo.X();
-        centro[i].Z() = (-vectorIzquierda[1])/(2*vectorIzquierda[0]);
-        centro[i].Y() = (-vectorIzquierda[2])/(2*vectorIzquierda[0]);
+        centro[i].Z() = resultado[0];
+        centro[i].Y() = resultado[1];
         centro[i] = quaternionInverso.Rotate(centro[i]);
         nuevoCentro[i] = vcg::ClosestPoint(ejeFinal,centro[i]);
         errorAcumulado = errorAcumulado + 1.*(nuevoCentro[i]-centro[i]).Norm();
@@ -1458,82 +1447,112 @@ float GLArea::calidadDelEje(){
     return 1.*errorAcumulado;
 }
 
-float GLArea::Determinante(float** mat, int tam){
-    if(tam == 2){
-        return mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
-    }else if(tam == 3){
-        return mat[0][0]*mat[1][1]*mat[2][2] +
-               mat[1][0]*mat[2][1]*mat[0][2] +
-               mat[2][0]*mat[0][1]*mat[1][2] -
-               mat[2][1]*mat[1][1]*mat[0][2] -
-               mat[0][0]*mat[2][1]*mat[1][2] -
-               mat[1][0]*mat[0][1]*mat[2][2];
-    }else
-        return -1;
+float * GLArea::ajusteCirculo(QList<vcg::Point3f> conjuntoPuntos){
+        float xm, ym, factor, error, a0, b0, Li, La, Lb, L, a, b, r[3];
+        xm = 0;
+        ym = 0;
+        factor = 1.0 / float(conjuntoPuntos.size());
+        foreach(vcg::Point3f puntoActual, conjuntoPuntos){
+                xm += puntoActual.Z();
+                ym += puntoActual.Y();
+        }
+        xm *= factor;
+        ym *= factor;
+
+        a0 = xm;
+        b0 = ym;
+
+        do{
+            La=Lb=L=0;
+            foreach(vcg::Point3f puntoActual, conjuntoPuntos){
+                Li = sqrt((puntoActual.Z()-a0)*(puntoActual.Z()-a0)+(puntoActual.Y()-b0)*(puntoActual.Y()-b0));
+                La+=(a0-puntoActual.Z())/Li;
+                Lb+=(b0-puntoActual.Y())/Li;
+                L+=Li;
+            }
+            L*=factor;
+            La*=factor;
+            Lb*=factor;
+            a = xm+L*La;
+            b = ym+L*Lb;
+            error = sqrt((a0-a)*(a0-a)+(b0-b)*(b0-b));
+            a0 = a;
+            b0 = b;
+        }while(error > 0.00001);
+
+        Li=0;
+        foreach(vcg::Point3f puntoActual, conjuntoPuntos)
+                Li+=sqrt((puntoActual.Z()-a0)*(puntoActual.Z()-a0)+(puntoActual.Y()-b0)*(puntoActual.Y()-b0));
+        r[2] = Li*factor;
+        r[0] = a;
+        r[1] = b;
+
+        return r;
 }
 
-vcg::Matrix33f GLArea::Inversa(vcg::Matrix33f mat){
-    vcg::Matrix33f mat2;
-    float ** miniMatriz;
-    float ** maxiMatriz;
-    miniMatriz = new float*[2];
-    miniMatriz[0] = new float[2];
-    miniMatriz[1] = new float[2];
-    maxiMatriz = new float*[3];
-    for(int i=0; i<3; ++i){
-        maxiMatriz[i] = new float [3];
-        for(int j=0; j<3; ++j)
-            maxiMatriz[i][j] = mat[i][j];
+
+
+void GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
+    PuntoContornoLight p0;
+    //puntoGraham * primerPunto;
+    QMap<PuntoContornoLight,PuntoContornoLight> puntosOrdenados;
+    QMap<float,PuntoContornoLight> puntosAlturasOrdenados;
+    int i, m, n, posMin = 0;
+    float cat, alt, angulo;
+    //Seleccionar el punto con menor altura y mas cerca del eje
+    for(i=0; i<puntos.size(); ++i)
+        if(puntos.at(i).altura < puntos.at(posMin).altura ||
+           (puntos.at(i).altura == puntos.at(posMin).altura &&
+            puntos.at(i).distancia < puntos.at(posMin).distancia))
+                posMin = i;
+    //se hace que ese punto este en el primer lugar
+    p0.altura = puntos.at(0).altura;
+    p0.distancia = puntos.at(0).distancia;
+    puntos.replace(0,puntos.at(posMin));
+    puntos.replace(posMin,p0);
+    //Se ordenan el resto de puntos segun el angulo
+
+    for(i=1; i<puntos.size(); ++i){
+        cat = puntos[i].distancia - p0.distancia;
+        alt = puntos[i].altura - p0.altura;
+        puntos[i].angulo = atan2(alt,cat);
+        puntos[i].dist2 = sqrt(cat*cat + alt*alt);
+        puntosOrdenados.insert(puntos[i],puntos[i]);
     }
-    miniMatriz[0][0] = mat[1][1];
-    miniMatriz[0][1] = mat[1][2];
-    miniMatriz[1][0] = mat[2][1];
-    miniMatriz[1][1] = mat[2][2];
-    mat2[0][0] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][2];
-    miniMatriz[0][1] = mat[0][1];
-    miniMatriz[1][0] = mat[2][2];
-    miniMatriz[1][1] = mat[2][1];
-    mat2[0][1] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][1];
-    miniMatriz[0][1] = mat[0][2];
-    miniMatriz[1][0] = mat[1][1];
-    miniMatriz[1][1] = mat[1][2];
-    mat2[0][2] = Determinante(miniMatriz,2);
+    puntos.clear();
+    puntos.append(puntosOrdenados.values().at(puntosOrdenados.size()-1));
+    puntos.append(puntosOrdenados.values());
 
-    miniMatriz[0][0] = mat[1][2];
-    miniMatriz[0][1] = mat[1][0];
-    miniMatriz[1][0] = mat[2][2];
-    miniMatriz[1][1] = mat[2][0];
-    mat2[1][0] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][0];
-    miniMatriz[0][1] = mat[0][2];
-    miniMatriz[1][0] = mat[2][0];
-    miniMatriz[1][1] = mat[2][2];
-    mat2[1][1] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][2];
-    miniMatriz[0][1] = mat[0][0];
-    miniMatriz[1][0] = mat[1][2];
-    miniMatriz[1][1] = mat[1][0];
-    mat2[1][2] = Determinante(miniMatriz,2);
+    m = 2;
+    n = puntosOrdenados.size();
+    for(int i=3; i<=n; ++i){
+        while(m > 1 && ccw(puntos.at(m-1),puntos.at(m),puntos.at(i))<=0)
+            m--;
 
-    miniMatriz[0][0] = mat[1][0];
-    miniMatriz[0][1] = mat[1][1];
-    miniMatriz[1][0] = mat[2][0];
-    miniMatriz[1][1] = mat[2][1];
-    mat2[2][0] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][1];
-    miniMatriz[0][1] = mat[0][0];
-    miniMatriz[1][0] = mat[2][1];
-    miniMatriz[1][1] = mat[2][0];
-    mat2[2][1] = Determinante(miniMatriz,2);
-    miniMatriz[0][0] = mat[0][0];
-    miniMatriz[0][1] = mat[0][1];
-    miniMatriz[1][0] = mat[1][0];
-    miniMatriz[1][1] = mat[1][1];
-    mat2[2][2] = Determinante(miniMatriz,2);
+        m++;
+        p0 = puntos.at(m);
+        puntos[m] = puntos.at(i);
+        puntos[i] = p0;
+    }
 
-    mat2 = mat2 * Determinante(maxiMatriz,3);
-    return mat2;
+    for(int i=n; i>m; --i){
+        puntosAlturasOrdenados.insert(-puntos.at(i).altura,puntos.at(i));
+        emit Imprimir("\nInsertando: " + QString::number(puntos.at(i).altura) + " " + QString::number(puntos.at(i).distancia));
+        puntos.removeAt(i);
+    }
+
+    emit Imprimir("\nTamanio de esta cosa" + QString::number(m) + " " + QString::number(n) + " - " + QString::number(puntosAlturasOrdenados.size()));
+
+    foreach(PuntoContornoLight puntito, puntosAlturasOrdenados){
+        angulo = acos(ccw(puntos.at(m),puntito,puntos.at(0))) * 180./PI;
+        emit Imprimir("\nAngulo: " + QString::number(angulo) + " Altura: " + QString::number(puntito.altura));
+        if(angulo >= 90){
+            puntos.append(puntito);
+            m++;
+        }
+    }
 }
+
+
+
 
