@@ -1,0 +1,16 @@
+Casos de Uso generales:
+1.	AbrirArchivo – CU-1
+2.	CerrarArchivo – CU-2.
+3.	GuardarArchivo – CU-3.
+4.	CerrarAplicación – CU-4.
+5.	ImportarPieza – CU-5.
+6.	ExportarPieza – CU-6.
+
+
+Casos de Uso de reconstrucción:
+1.	ObtenerEjeRotación – CU-7.
+2.	SeleccionarContornoDePieza – CU-8.
+3.	RegenerarCeramica – CU-9.
+4.	ObtenerDibujoArqueológico – CU-10.
+5.	ExportarDibujoArqueológico – CU-11.
+
