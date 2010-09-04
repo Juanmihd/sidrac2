@@ -6,7 +6,7 @@ LANGUAGE = C++
 QT += opengl
 CONFIG += thread
 
-# CONFIG += console
+CONFIG += console
 # Executable name
 TARGET = SIDRAC2
 

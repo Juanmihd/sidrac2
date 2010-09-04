@@ -90,6 +90,9 @@ MainWindow::MainWindow (QWidget * parent):QMainWindow (parent)
   connect (ui.glArea, SIGNAL (activaBotonEje()),
            this, SLOT (activaBotonEje()));
 
+  connect (ui.glArea, SIGNAL (activaBotonContorno()),
+           this, SLOT (activaBotonContorno()));
+
   connect (ui.glArea, SIGNAL (activaBotonVoxels()),
            this, SLOT (activaBotonVoxels()));
 
@@ -442,7 +445,6 @@ void MainWindow::inicializarEje(int limInf, int limIntermedio, int porcentaje, i
       parametrosConfiguracion[7] = calcularVoxels;
       parametrosConfiguracion[8] = calcularEje;
 
-    ui.BotonContorno->setEnabled(true);
     ui.BotonTemporal->setEnabled(true);
     ui.BotonReset->setEnabled(true);
     ui.BotonGenerar->setEnabled(true);
@@ -485,6 +487,10 @@ void MainWindow::on_BotonDibujarEje_clicked()
 
 void MainWindow::activaBotonEje(){
     ui.BotonDibujarEje->setEnabled(true);
+}
+
+void MainWindow::activaBotonContorno(){
+    ui.BotonContorno->setEnabled(true);
 }
 
 void MainWindow::activaBotonVoxels(){

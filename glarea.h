@@ -9,6 +9,7 @@
 #include "puntocontorno.h"
 #include "hebracalculoeje.h"
 
+using namespace std;
 
 class GLArea:public QGLWidget
 {
@@ -71,6 +72,7 @@ signals:
   void RatonEnGLArea();
   void activaBotonEje();
   void activaBotonVoxels();
+  void activaBotonContorno();
 protected:
   /// opengl initialization and drawing calls
   void initializeGL ();
@@ -93,6 +95,7 @@ private:
   vcg::Point3f posicionGlobal;
   QMap<puntoContorno,puntoContorno> contornoOrdenado;
   QList<PuntoContornoLight> puntosGrahamOrdenados;
+  int tamPuntosm;
   QList<PuntoContornoLight> puntosObtenidos;
   QList<puntoContorno> contorno;
   QMap<float, puntoContorno> contornoAlturas;
@@ -193,9 +196,10 @@ private:
   void GeneticoRefinaEje();
   void ObtenerPlanosCorte();
   float * ajusteCirculo(QList<vcg::Point3f> conjuntoPuntos);
+  void AdaptarEje();
 
 
-void GrahamScan(QList<PuntoContornoLight> &puntos);
+int GrahamScan(QList<PuntoContornoLight> &puntos);
  };
 
 

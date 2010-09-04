@@ -72,6 +72,7 @@ private slots:
     void on_BotonInvertir_clicked();
     void activaBotonEje();
     void activaBotonVoxels();
+    void activaBotonContorno();
     void on_BotonDibujarEje_clicked();
     void on_BotonDibujarVoxels_clicked();
     void ajustarMaximoVoxeles(int valor);

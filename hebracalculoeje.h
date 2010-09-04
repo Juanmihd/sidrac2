@@ -9,6 +9,7 @@
 #define PI 3.141592
 #endif
 
+using namespace std;
 
 class hebraCalculoEje : public QThread
 {
@@ -49,7 +50,7 @@ private:
     void RANSAC();
     void SeleccionaPuntos(vcg::Point3f &punto1, vcg::Point3f & punto2);
     void SeleccionaPuntosCluster(vcg::Point3f &punto1, vcg::Point3f & punto2);
-    float ComprobarDistancia(vcg::Line3f recta, float distancia, int filtro);
+    void ComprobarDistancia(vcg::Line3f recta, float distancia, int filtro);
     void ObtenerVoxelsNormal(vcg::Line3f normal, int CaraActual);
     bool MuyParecidos(vcg::Point3f p1, vcg::Point3f p2, float error){
         vcg::Point3f diferencia = p1-p2;

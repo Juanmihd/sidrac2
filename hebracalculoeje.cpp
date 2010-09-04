@@ -363,7 +363,7 @@ void hebraCalculoEje::SeleccionaPuntosCluster(vcg::Point3f &punto1, vcg::Point3f
     punto2 = punto1 + direccion;
 }
 
-float hebraCalculoEje::ComprobarDistancia(vcg::Line3f rectaPrueba, float distanciaMaxima, int filtro){
+void hebraCalculoEje::ComprobarDistancia(vcg::Line3f rectaPrueba, float distanciaMaxima, int filtro){
     float dist;
     vcg::Point3f puntoAux;
     voxelsDentro.clear();
@@ -384,7 +384,7 @@ float hebraCalculoEje::ComprobarDistancia(vcg::Line3f rectaPrueba, float distanc
                 voxelsFuera.append(voxel);
         }
     }
-    return distanciaMedia /= num;
+    distanciaMedia /= num;
 }
 
 void hebraCalculoEje::run(){
@@ -392,7 +392,10 @@ void hebraCalculoEje::run(){
         inicializarEje();
     if(operacion == 1)
         RANSAC();
-    emit Imprimir("\n¡¡¡PERO ESTO QUE ES!!!!" + QString::number(operacion));
+    cout << "AAARG";
+
+    cout << ejeFinal.Origin().X() << " " <<ejeFinal.Origin().Y() << " " <<ejeFinal.Origin().Z() << "\n";
+    cout << ejeFinal.Direction().X() << " " <<ejeFinal.Direction().Y() << " " <<ejeFinal.Direction().Z() << "\n";
 
     emit finalizaHebra(voxels,
                        valorMedio,
@@ -400,6 +403,5 @@ void hebraCalculoEje::run(){
                        maxInterseccionVoxel,
                        ejeFinal);
 
-
-    emit Imprimir("\n¡¡¡PERO ESTO QUE ES!!!! x 2");
+    cout << "AAARG x 2";
 }

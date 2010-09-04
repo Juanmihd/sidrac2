@@ -228,7 +228,7 @@ void GLArea::initMesh(QString message)
     //distanciaMinima = diagonal;
     glWrap.Update();
     diagonal = glWrap.m->bbox.Diag();
-
+    cout << "\nDimensiones" << glWrap.m->bbox.DimX() << "\n"<< glWrap.m->bbox.DimY() << "\n"<< glWrap.m->bbox.DimZ() << "\n";
     updateGL();
     emit setTextoInformacion(QString::number(glWrap.m->face.size())+" caras. "+
                              QString::number(glWrap.m->vert.size())+" vertices.");
@@ -319,6 +319,15 @@ void GLArea::paintGL ()
             glEnd();
             glColor3f(0.4,1,0.4);
             glBegin(GL_LINE_STRIP);
+                for(int i=1; i<tamPuntosm; ++i){
+                    glVertex3f(puntosObtenidos.at(i).distancia*cos(0),
+                               puntosObtenidos.at(i).altura - 1,
+                               puntosObtenidos.at(i).distancia*sin(0));
+                }
+            glEnd();
+
+            glColor3f(0.4,1,0.4);
+            glBegin(GL_LINE_STRIP);
                 foreach(PuntoContornoLight puntoActual, puntosObtenidos){
                     glVertex3f(puntoActual.distancia*cos(0),
                                puntoActual.altura,
@@ -388,6 +397,22 @@ void GLArea::paintGL ()
                                ejeDePrueba.Origin().Y() + 100.*ejeDePrueba.Direction().Y(),
                                ejeDePrueba.Origin().Z() + 100.*ejeDePrueba.Direction().Z());
                     glEnd();
+                glColor3f(0,0,1);
+                glEnable(GL_POINT_SMOOTH);
+                glPointSize(5);
+                glBegin(GL_POINTS);
+                glVertex3f(ejeDePrueba.Origin().X(),
+                           ejeDePrueba.Origin().Y(),
+                           ejeDePrueba.Origin().Z());
+                glEnd();
+                glColor3f(1,0,0);
+                glBegin(GL_POINTS);
+                glVertex3f(ejeDePrueba.Origin().X() + ejeDePrueba.Direction().X(),
+                           ejeDePrueba.Origin().Y() + ejeDePrueba.Direction().Y(),
+                           ejeDePrueba.Origin().Z() + ejeDePrueba.Direction().Z());
+                glEnd();
+                glDisable(GL_POINT_SMOOTH);
+                glPointSize(1);
                 }
                 glEnable(GL_LIGHTING);
                 glPopMatrix();
@@ -484,8 +509,28 @@ void GLArea::paintGL ()
                     glVertex3f(nuevoCentro[i].X(),nuevoCentro[i].Y(),nuevoCentro[i].Z());
                 glEnd();
                 glEnable(GL_LIGHTING);
+
+
             }
             if(modoDibujado)
+                if(true){//Dibujar bounding box
+                    glEnable(GL_POINT_SMOOTH);
+                    glDisable(GL_LIGHTING);
+                    glPointSize(3);
+                    glColor3f(1,0,0);
+                    glBegin(GL_POINTS);
+                            glVertex3f(-glWrap.m->bbox.DimX()/2.,-glWrap.m->bbox.DimY()/2.,-glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f(-glWrap.m->bbox.DimX()/2.,-glWrap.m->bbox.DimY()/2., glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f(-glWrap.m->bbox.DimX()/2., glWrap.m->bbox.DimY()/2.,-glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f(-glWrap.m->bbox.DimX()/2., glWrap.m->bbox.DimY()/2., glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f( glWrap.m->bbox.DimX()/2.,-glWrap.m->bbox.DimY()/2.,-glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f( glWrap.m->bbox.DimX()/2.,-glWrap.m->bbox.DimY()/2., glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f( glWrap.m->bbox.DimX()/2., glWrap.m->bbox.DimY()/2.,-glWrap.m->bbox.DimZ()/2.);
+                            glVertex3f( glWrap.m->bbox.DimX()/2., glWrap.m->bbox.DimY()/2., glWrap.m->bbox.DimZ()/2.);
+                    glEnd();
+                    glDisable(GL_POINT_SMOOTH);
+                    glEnable(GL_LIGHTING);
+                }
                 switch(drawmode)
                 { //Dibuja pieza sin reconstruir
                   case SMOOTH:
@@ -755,16 +800,17 @@ void GLArea::CalcularContorno(bool entera){
     QList<PuntoContornoLight>::iterator itPuntos;
     puntoContorno puntoNuevo;
     int contandito = 0, contadorPuntos = 0;
+        emit Imprimir("\n Altura baja: "+QString::number(alturaBaja));
     foreach(puntoContorno punto, contornoAlturas){
+        emit Imprimir("\n Altura: "+QString::number(puntoInsertando.altura));
         puntoInsertando.altura = punto.altura - alturaBaja;
         puntoInsertando.distancia = punto.distancia;
         puntosObtenidos.append(puntoInsertando);
-       // emit Imprimir("\n Altura: "+QString::number(puntoInsertando.altura));
     }
     alturaAlta -= alturaBaja;
     alturaBaja = 0;
     puntosGrahamOrdenados = puntosObtenidos;
-    GrahamScan(puntosObtenidos);
+    tamPuntosm = GrahamScan(puntosObtenidos);
 
     //emit Imprimir("\n AlturaBaja: "+QString::number(alturaBaja) + " AlturaAlta: "+QString::number(alturaAlta)+ " SaltoAltura: "+QString::number(saltoAltura));
 /*
@@ -819,7 +865,7 @@ void GLArea::CalcularContorno(bool entera){
 
     emit Imprimir ("\nTamanio de esta cosa\n" + QString::number(puntosGrahamOrdenados.size()) + "\n");
 
-/*
+
     for(float altura = alturaBaja; altura <= alturaAlta; altura+=saltoAltura){
         puntosLaterales.clear();
         contandito++;
@@ -1209,6 +1255,132 @@ void GLArea::continuarRANSAC(){
         emit setStatusBar(tr("No se puede continuar calculando RANSAC si no se ha iniciado a calcular"));
 }
 
+void GLArea::AdaptarEje(){
+    float x,y,z,minimo,aux;
+    int redondeado, menor;
+    minimo = 100000000;
+    menor = -1;
+    if(ejeFinal.Direction().X() != 0)
+        if(ejeFinal.Origin().X() > -glWrap.m->bbox.DimX()/2.){
+            x = (-glWrap.m->bbox.DimX()/2. - ejeFinal.Origin().X())/ejeFinal.Direction().X();
+            if(x<0) minimo = -x;
+            else minimo = x;
+            menor = 0;
+        }
+    if(ejeFinal.Direction().Y() != 0)
+        if(ejeFinal.Origin().Y() > -glWrap.m->bbox.DimY()/2.){
+            y = (-glWrap.m->bbox.DimY()/2. - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
+            if(y<0) aux = -y;
+            else aux = y;
+            if(aux < minimo){
+                minimo = aux;
+                menor = 1;
+            }
+        }
+    if(ejeFinal.Direction().Z() != 0)
+        if(ejeFinal.Origin().Z() > -glWrap.m->bbox.DimZ()/2.){
+            z = (-glWrap.m->bbox.DimZ()/2. - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
+            if(z<0) aux = -z;
+            else aux = z;
+            if(aux < minimo){
+                minimo = aux;
+                menor = 2;
+            }
+        }
+    cout << "\n MENORL ORIGENRL " << menor;
+    if(menor != -1){
+        if(menor == 0)
+            aux = x;
+        else if(menor == 1)
+            aux = y;
+        else if(menor == 2)
+            aux = z;
+
+        if(aux > 0){
+            redondeado = aux;
+            redondeado ++;
+        }else{
+            aux = -aux;
+            redondeado = aux;
+            redondeado ++;
+            redondeado = - redondeado;
+        }
+
+        ejeFinal.SetOrigin(ejeFinal.Origin() + ejeFinal.Direction() * redondeado);
+    }
+    
+
+    minimo = 100000000;
+    menor = -1;
+    if(ejeFinal.Direction().X() != 0)
+        if(ejeFinal.Origin().X()+ejeFinal.Direction().X() < glWrap.m->bbox.DimX()/2.){
+            x = (glWrap.m->bbox.DimX()/2. - ejeFinal.Origin().X())/ejeFinal.Direction().X();
+            if(x<0) minimo = -x;
+            else minimo = x;
+            menor = 0;
+        }
+    if(ejeFinal.Direction().Y() != 0)
+        if(ejeFinal.Origin().Y()+ejeFinal.Direction().Y() < glWrap.m->bbox.DimY()/2.){
+            y = (glWrap.m->bbox.DimY()/2. - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
+            if(y<0) aux = -y;
+            else aux = y;
+            if(aux < minimo){
+                minimo = aux;
+                menor = 1;
+            }
+        }
+    if(ejeFinal.Direction().Z() != 0)
+        if(ejeFinal.Origin().Z()+ejeFinal.Direction().Z() < glWrap.m->bbox.DimZ()/2.){
+            z = (glWrap.m->bbox.DimZ()/2. - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
+            if(z<0) aux = -z;
+            else aux = z;
+            if(aux < minimo){
+                minimo = aux;
+                menor = 2;
+            }
+        }
+    cout << "\n MENORL DESTINORL " << menor;
+    if(menor != -1){
+        if(menor == 0)
+            aux = x;
+        else if(menor == 1)
+            aux = y;
+        else if(menor == 2)
+            aux = z;
+
+        if(aux > 0){
+            redondeado = aux;
+            redondeado ++;
+        }else{
+            aux = -aux;
+            redondeado = aux;
+            redondeado ++;
+            redondeado = - redondeado;
+        }
+
+        ejeFinal.SetDirection(ejeFinal.Direction() * redondeado);
+    }/*
+
+    if(menor != -1){
+        minimo = -1;
+        if(menor == 0){
+                x = (glWrap.m->bbox.DimX()*0.65 - ejeFinal.Origin().X())/ejeFinal.Direction().X();
+                aux = x;
+                minimo = 1;
+        }else if(menor == 1){
+                y = (glWrap.m->bbox.DimY()*0.65 - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
+                aux = y;
+                minimo = 1;
+        }else if(menor == 2){
+                z = (glWrap.m->bbox.DimZ()*0.65 - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
+                aux = z;
+                minimo = 1;
+        }
+        if(minimo == 1)
+            ejeFinal.SetDirection(ejeFinal.Direction() * aux);
+    }*/
+}
+
 void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFinal, vcg::Point3f nodoRaizFinal, int maxInterseccionVoxelFinal, vcg::Line3f ejeFinalFinal){
     float calidad;
     voxels = voxelsFinal;
@@ -1220,24 +1392,40 @@ void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFi
     nodoRaiz = nodoRaizFinal;
     maxInterseccionVoxel = maxInterseccionVoxelFinal;
     ejeFinal = ejeFinalFinal;
-    while(ejeFinal.Direction().Norm() < 1){
-        ejeFinal.Direction()*10;
-    }
+    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()
+                           << " Y " << ejeFinal.Origin().Y()
+                           << " Z " << ejeFinal.Origin().X()<< "\n";
+    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()+ejeFinal.Direction().X()
+                           << " Y " << ejeFinal.Origin().Y()+ejeFinal.Direction().Y()
+                           << " Z " << ejeFinal.Origin().X()+ejeFinal.Direction().Z() << "\n";
+    cout << "\nDimensiones caja: X " << glWrap.m->bbox.DimX()*0.5
+                            << " Y " << glWrap.m->bbox.DimY()*0.5
+                            << " Z " << glWrap.m->bbox.DimZ() << "\n";
+    AdaptarEje();
+    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()
+                           << " Y " << ejeFinal.Origin().Y()
+                           << " Z " << ejeFinal.Origin().X()<< "\n";
+    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()+ejeFinal.Direction().X()
+                           << " Y " << ejeFinal.Origin().Y()+ejeFinal.Direction().Y()
+                           << " Z " << ejeFinal.Origin().X()+ejeFinal.Direction().Z() << "\n";
     emit ajustarMaximoVoxeles(maxInterseccionVoxel);
     valorColorVoxel = maxInterseccionVoxel - cantidadDeIntersecciones;
     valorColorVoxel = valorColorVoxel / 7;
     if(valorColorVoxel <= 0) valorColorVoxel = 1;
-    if(realizarGenetico)
+
+   /* if(realizarGenetico)
         calidad = calidadDelEje();
     else
         calidad = -1;
+
     calidadAnterior = calidad;
     emit Imprimir("\nLa calidad del eje: " + QString::number(calidad) + " y el tamanio del mismo " + QString::number(ejeFinal.Direction().Norm()));
     if(calidad>=0){
         dibujarAristas = true;
-    }
+    }*/
     noMejora = false;
     estadoDelCalculo = 1;
+    emit activaBotonContorno();
 }
 
 void GLArea::GeneticoRefinaEje(){
@@ -1357,22 +1545,18 @@ float GLArea::reCalidadDelEje(int genetico){
 
 void GLArea::ObtenerPlanosCorte(){
     vcg::Plane3f plano;
-    float altura = 0;
+    float altura = -glWrap.m->bbox.MaxDim();
     do{
-        plano.Set(ejeFinal.Direction(),(altura * diagonal));
-        altura = altura + 0.05;
-    }while(InterseccionPlanoPieza(plano,0));
-    altura = altura - 0.15;
-    plano.Set(ejeFinal.Direction(),(altura * diagonal));
-    InterseccionPlanoPieza(plano,0);
-    altura = 0;
+        plano.Set(ejeFinal.Direction(),altura);
+        altura = altura + 0.0001;
+        //cout << "\n" << altura << "\n";
+    }while(!InterseccionPlanoPieza(plano,0));
+    altura = glWrap.m->bbox.MaxDim();
     do{
-        plano.Set(ejeFinal.Direction(),(altura * diagonal));
-        altura = altura - 0.05;
-    }while(InterseccionPlanoPieza(plano,1));
-    altura = altura + 0.15;
-    plano.Set(ejeFinal.Direction(),(altura*diagonal));
-    InterseccionPlanoPieza(plano,1);
+        plano.Set(ejeFinal.Direction(),altura);
+        altura = altura - 0.0001;
+        //cout << "\n" << altura << "\n";
+    }while(!InterseccionPlanoPieza(plano,1));
 }
 
 float GLArea::calidadDelEje(){
@@ -1492,7 +1676,7 @@ float * GLArea::ajusteCirculo(QList<vcg::Point3f> conjuntoPuntos){
 
 
 
-void GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
+int GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
     PuntoContornoLight p0;
     //puntoGraham * primerPunto;
     QMap<PuntoContornoLight,PuntoContornoLight> puntosOrdenados;
@@ -1500,11 +1684,13 @@ void GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
     int i, m, n, posMin = 0;
     float cat, alt, angulo;
     //Seleccionar el punto con menor altura y mas cerca del eje
-    for(i=0; i<puntos.size(); ++i)
+    for(i=0; i<puntos.size(); ++i){
+        emit Imprimir("\nPunto: "+QString::number(puntos.at(i).altura) +" "+QString::number(puntos.at(i).distancia));
         if(puntos.at(i).altura < puntos.at(posMin).altura ||
            (puntos.at(i).altura == puntos.at(posMin).altura &&
             puntos.at(i).distancia < puntos.at(posMin).distancia))
                 posMin = i;
+    }
     //se hace que ese punto este en el primer lugar
     p0.altura = puntos.at(0).altura;
     p0.distancia = puntos.at(0).distancia;
@@ -1534,23 +1720,26 @@ void GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
         puntos[m] = puntos.at(i);
         puntos[i] = p0;
     }
-
-    for(int i=n; i>m; --i){
+/*
+    for(int i=n; i>=m; --i){
         puntosAlturasOrdenados.insert(-puntos.at(i).altura,puntos.at(i));
-        emit Imprimir("\nInsertando: " + QString::number(puntos.at(i).altura) + " " + QString::number(puntos.at(i).distancia));
+        //emit Imprimir("\nInsertando: " + QString::number(puntos.at(i).altura) + " " + QString::number(puntos.at(i).distancia));
         puntos.removeAt(i);
     }
-
-    emit Imprimir("\nTamanio de esta cosa" + QString::number(m) + " " + QString::number(n) + " - " + QString::number(puntosAlturasOrdenados.size()));
+    int mtemp = m;
+    emit Imprimir("\nTamanio de esta cosa" + QString::number(m) + " " + QString::number(n) + " - " + QString::number(puntosAlturasOrdenados.size()) + "\n");
 
     foreach(PuntoContornoLight puntito, puntosAlturasOrdenados){
         angulo = acos(ccw(puntos.at(m),puntito,puntos.at(0))) * 180./PI;
-        emit Imprimir("\nAngulo: " + QString::number(angulo) + " Altura: " + QString::number(puntito.altura));
-        if(angulo >= 90){
+        emit Imprimir("Angulo: " + QString::number(angulo) + " Altura: " + QString::number(puntito.altura));
+        //if(angulo >= 90){
             puntos.append(puntito);
+            emit Imprimir (tr("¡¡PADENTRO!!"));
             m++;
-        }
-    }
+        //}
+            emit Imprimir (tr("\n"));
+    }*/
+    return m;
 }
 
 
