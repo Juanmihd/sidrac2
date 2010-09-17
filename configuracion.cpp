@@ -20,8 +20,6 @@ Configuracion::Configuracion(QWidget *parent, int * parametros) :
         m_ui->limiteIteraciones->setValue(parametros[4]);
         m_ui->amplitud->setValue(parametros[5]);
         m_ui->amplitudMin->setValue(parametros[6]);
-        if(parametros[7])
-            m_ui->calcularVoxels->setChecked(true);
         if(parametros[8])
             m_ui->calcularEje->setChecked(true);
     }
@@ -54,7 +52,7 @@ void Configuracion::on_buttonBox_accepted()
                         m_ui->limiteIteraciones->text().toInt(),
                         m_ui->amplitud->text().toInt(),
                         m_ui->amplitudMin->text().toInt(),
-                        m_ui->calcularVoxels->isChecked(),
+                        true,
                         m_ui->calcularEje->isChecked(),
                         m_ui->refinarEje->isChecked());
 }
@@ -67,7 +65,6 @@ void Configuracion::porDefecto(int * parametrosDefecto){
     m_ui->limiteIteraciones->setValue(parametrosDefecto[4]);
     m_ui->amplitud->setValue(parametrosDefecto[5]);
     m_ui->amplitudMin->setValue(parametrosDefecto[6]);
-    m_ui->calcularVoxels->setChecked(true);
     m_ui->calcularEje->setChecked(true);
 }
 
@@ -77,13 +74,6 @@ void Configuracion::on_calcularEje_clicked()
     m_ui->limiteIntersec->setEnabled(m_ui->calcularEje->isChecked());
     m_ui->limiteIteraciones->setEnabled(m_ui->calcularEje->isChecked());
     m_ui->amplitud->setEnabled(m_ui->calcularEje->isChecked());
-}
-
-void Configuracion::on_calcularVoxels_clicked()
-{
-    m_ui->limiteInferior->setEnabled(m_ui->calcularVoxels->isChecked());
-    m_ui->limiteMedio->setEnabled(m_ui->calcularVoxels->isChecked());
-    m_ui->amplitudMin->setEnabled(m_ui->calcularVoxels->isChecked());
 }
 
 void Configuracion::on_predeterminado_clicked()

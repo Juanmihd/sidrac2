@@ -5,8 +5,8 @@ LANGUAGE = C++
 # QT modules
 QT += opengl
 CONFIG += thread
+#CONFIG += console
 
-CONFIG += console
 # Executable name
 TARGET = SIDRAC2
 
@@ -50,4 +50,4 @@ SOURCES += mainwindow.cpp
 SOURCES += glarea.cpp
 FORMS += mainwindow.ui \
     configuracion.ui
-RESOURCES += 
+RESOURCES += Iconos.qrc

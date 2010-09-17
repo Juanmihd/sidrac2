@@ -142,7 +142,7 @@ void hebraCalculoEje::InicializarVoxels(){
     distanciaMinima = 0.5*glWrap.m->bbox.MinDim();
     posicionGlobal = glWrap.m->bbox.Center();
     nivelVoxels = 9;
-    anchoVoxels = pow(2,nivelVoxels);
+    anchoVoxels = (int) pow(2,nivelVoxels);
     voxels.clear();
     valorMedio = (int) anchoVoxels / 2;
 

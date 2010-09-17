@@ -1,0 +1,63 @@
+<RCC>
+    <qresource prefix="/new/IconosPrograma" >
+        <file>Iconos/image_next.ico</file>
+        <file>Iconos/folder_next.ico</file>
+        <file>Iconos/folder_previous.ico</file>
+        <file>Iconos/folder_remove.ico</file>
+        <file>Iconos/Untitled-1.png</file>
+        <file>Iconos/page.ico</file>
+        <file>Iconos/page_edit.ico</file>
+        <file>Iconos/page_next.ico</file>
+        <file>Iconos/page_previous.ico</file>
+        <file>Iconos/page_remove.ico</file>
+        <file>Iconos/Cerrar.png</file>
+        <file>Iconos/1284501154_exit-off-power-shutdown.png</file>
+        <file>Iconos/exportar3d.png</file>
+    </qresource>
+    <qresource prefix="/new/IconosVisualizacion" >
+        <file>Iconos/process_remove.ico</file>
+        <file>Iconos/image_next.ico</file>
+        <file>Iconos/process.ico</file>
+        <file>Iconos/window.ico</file>
+        <file>Iconos/windows.ico</file>
+        <file>Iconos/application_lock.ico</file>
+        <file>Iconos/application_up.ico</file>
+        <file>Iconos/CerrarAplicacion.png</file>
+        <file>Iconos/applications.ico</file>
+        <file>Iconos/Colores.png</file>
+        <file>Iconos/movie_track_remove.ico</file>
+        <file>Iconos/movie_track.ico</file>
+        <file>Iconos/Perspectiva.png</file>
+        <file>Iconos/MostrarVoxels.png</file>
+        <file>Iconos/MostrarEje.png</file>
+        <file>Iconos/MostrarNormales.png</file>
+    </qresource>
+    <qresource prefix="/new/IconosReconstruccion" >
+        <file>Iconos/image_remove.ico</file>
+        <file>Iconos/image.ico</file>
+        <file>Iconos/Deshacer.png</file>
+        <file>Iconos/ConReset.png</file>
+        <file>Iconos/ContExt.png</file>
+        <file>Iconos/ContInt.png</file>
+        <file>Iconos/Contorno2.png</file>
+        <file>Iconos/Contorno.png</file>
+        <file>Iconos/Parametros.png</file>
+        <file>Iconos/Calculando Eje.png</file>
+        <file>Iconos/Eje.png</file>
+        <file>Iconos/EjeCerrar.png</file>
+        <file>Iconos/Invertir.png</file>
+        <file>Iconos/Refinar.png</file>
+        <file>Iconos/Elementos.png</file>
+        <file>Iconos/Cluster.png</file>
+        <file>Iconos/GenerarContorno.png</file>
+        <file>Iconos/Luz.png</file>
+        <file>Iconos/3dPulsado.png</file>
+        <file>Iconos/3d.png</file>
+        <file>Iconos/MoverPieza.png</file>
+    </qresource>
+    <qresource prefix="/new/IconosGlobales" >
+        <file>Iconos/back.ico</file>
+        <file>Iconos/PinPulsado.png</file>
+        <file>Iconos/pin.png</file>
+    </qresource>
+</RCC>

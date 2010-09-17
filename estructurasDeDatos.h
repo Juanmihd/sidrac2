@@ -1,4 +1,7 @@
 /**
+  * Autor: Juan Miguel Huertas Delgado
+  * estructurasDeDatos.h
+  *
   * En este archivo se encuentran la mayoria de los "includes" relacionados con la vcgLib para
   * tenerlos todos localizados en el mismo archivo y evitar duplicados.
   * Tambien estan aqui almacenadas
@@ -42,9 +45,10 @@
 #include "lib/wrap/gl/trimesh.h"
 #include "lib/wrap/gl/pick.h"
 #include "lib/wrap/gl/picking.h"
+#include "lib/wrap/gl/space.h"
 #include "lib/wrap/gui/trackball.h"
+#include "lib/wrap/gui/trackmode.h"
 #include "lib/vcg/complex/edgemesh/update/bounding.h"
-
 
 #include "voxel.h"
 
@@ -56,34 +60,73 @@
 class CEdge;
 class CFace;
 
-/// Declaracion de la clase vertice, se hace uso de vertice, arista, cara, coordenadas, normales, color, y algunos bit extra
+/// @brief Declaracion de la clase vertice, se hace uso de vertice, arista, cara, coordenadas, normales, color, y algunos bit extra
 class CVertex : public vcg::VertexSimp2< CVertex, CEdge, CFace, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b, vcg::vertex::BitFlags>{};
-/// Declaracion de la clase arista, usando verice y arista simplemente
+/// @brief Declaracion de la clase arista, usando verice y arista simplemente
 class CEdge   : public vcg::EdgeSimp1 < CVertex, CEdge, vcg::edge::VertexRef> {};
-/// Declaracion de la clase Cara, usando vertice, arista ,cara, referencia del vertice, normal, color, y algunos bit extra
+/// @brief Declaracion de la clase Cara, usando vertice, arista ,cara, referencia del vertice, normal, color, y algunos bit extra
 class CFace   : public vcg::FaceSimp2<   CVertex, CEdge, CFace, vcg::face::VertexRef, vcg::face::Normal3f, vcg::face::Color4b, vcg::face::BitFlags > {};
-/// Declaracion de la clase malla, usando un vector de vertices y otro de caras
+/// @brief Declaracion de la clase malla, usando un vector de vertices y otro de caras
 class CMesh   : public vcg::tri::TriMesh< std::vector<CVertex>, std::vector<CFace> > {};
-/// Declaracion de la clase malla de aristas, usando un vector de vertices y otro de aristas
+/// @brief Declaracion de la clase malla de aristas, usando un vector de vertices y otro de aristas
 class CEMesh  : public vcg::edg::EdgeMesh< std::vector<CVertex>, std::vector<CEdge> > {};
 
 typedef vcg::GridStaticPtr<CMesh::FaceType,CMesh::ScalarType> TriMeshGrid;
 
-struct PuntoLista{
-    vcg::Point3f punto;
-    int posicionSiguiente;
-};
 
+/**
+    @brief Estructura auxiliar que permite una forma rápida de acceder a un punto de contorno, almacenando distancia, altura, angulo y otra distancia auxiliar.
+    Tiene implementados los métodos para poder ser ordenado en función del ángulo y la distancia auxiliar (para contornos)
+*/
 struct PuntoContornoLight{
+    /** La distancia al eje de rotación*/
     float distancia;
+    /** La altura respecto al punto más bajo*/
     float altura;
+    /** El ángulo que forma el contorno internamente (NO SE USA)*/
     float angulo;
+    /** Una distancia auxiliar para calculo de envolvente (NO SE USA)*/
     float dist2;
+    /**
+    @brief Operator< que permite comparar dos puntos, sera menor segun el ángulo, y si es igual, segun la distancia
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator< (PuntoContornoLight p1) const{return (angulo < p1.angulo || (angulo == p1.angulo && dist2 < p1.dist2));}
+
+    /**
+    @brief Operator<= que permite comparar dos puntos, sera menor o igual segun el ángulo, y si es igual, segun la distancia
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator<=(PuntoContornoLight p1) const{return ((angulo < p1.angulo || (angulo == p1.angulo && dist2 < p1.dist2)) || (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2));}
+
+    /**
+    @brief Operator> que permite comparar dos puntos, sera mayor segun el ángulo, y si es igual, segun la distancia
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator> (PuntoContornoLight p1) const{return (angulo > p1.angulo || (angulo == p1.angulo && dist2 > p1.dist2));}
+
+    /**
+    @brief Operator>= que permite comparar dos puntos, sera mayor o igual segun el ángulo, y si es igual, segun la distancia
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator>=(PuntoContornoLight p1) const{return ((angulo > p1.angulo || (angulo == p1.angulo && dist2 > p1.dist2)) || (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2));}
+
+    /**
+    @brief Operator!= que permite comparar dos puntos, serán distintos si todos su componentes son iguales
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator!=(PuntoContornoLight p1) const{return (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2);}
+
+    /**
+    @brief Operator!= que permite comparar dos puntos, serán distintos si todos su componentes son iguales
+    @param p1 : PuntoContornoLight con el que se compara
+    @return El valor del booleano según lo especificado por esta función
+    */
     bool operator==(PuntoContornoLight p1) const{return (distancia == p1.distancia && altura == p1.altura && angulo == p1.angulo && dist2 == p1.dist2);}
 };
 

@@ -8,7 +8,7 @@
  *                                                                    \      *
  * All rights reserved.                                                      *
  *                                                                           *
- * This program is free software; you can redistribute it and/or modify      *   
+ * This program is free software; you can redistribute it and/or modify      *
  * it under the terms of the GNU General Public License as published by      *
  * the Free Software Foundation; either version 2 of the License, or         *
  * (at your option) any later version.                                       *
@@ -64,7 +64,9 @@ GLArea::GLArea (QWidget * parent)
     connect(hebra, SIGNAL(Imprimir(QString)),
             this, SLOT(ReImprimir(QString)), Qt::DirectConnection);
 
-
+    numPlanos = 0;
+    numContornos = 0;
+    numContornosInt = 0;
     ResetearPieza();
 
     updateGL();
@@ -72,6 +74,39 @@ GLArea::GLArea (QWidget * parent)
 }
 
 void GLArea::ResetearPieza(){
+    normales.clear();
+    puntosObtenidos.clear();
+    puntosExtras.clear();
+    contorno.clear();
+    carasSeleccionadas.clear();
+    contornoOrdenado.clear();
+    contornoAlturas.clear();
+    voxels.clear();
+    mesh.Clear();
+    mesh2.Clear();
+    meshExt.Clear();
+    /*
+    for(int i=0; i<numPlanos; ++i)
+        puntosDibujar->clear();
+    delete [] puntosDibujar;*/
+    for(int i=0; i<numContornos; ++i)
+        contornos[i].clear();
+    for(int i=0; i<numContornosInt; ++i){
+        contornosInt[i].clear();
+    }
+    if(numContornos > 0){
+        delete [] contornos;
+        delete [] contornosInt;
+    }
+    MAXCONTORNOS = 100;
+    MAXCONTORNOSINT = 100;
+    contornos = new QList<puntoContorno> [100];
+    contornosInt = new QList<puntoContorno> [100];
+    numContornos = 0;
+    numContornosInt = 0;
+    alreves = 1;
+    zoom = 1;
+    updown = leftright = alturaExtra = alturaExtraOld = anguloOld = anguloPieza = 0;
     botonIzquierdo = false;
     puntoAlto.setAltura(-100000000);
     estadoDelCalculo = -1;
@@ -90,13 +125,24 @@ void GLArea::ResetearPieza(){
     vcg::Point3f ejeDireccion (0,0,-40);
     ejeFinal.Set(ejeOrigen,ejeDireccion);
     //todos estos en falso
-    dibujarEje = dibujarEjeDePrueba = dibujarAristas = dibujarVoxels = piezaCargada = ransacCalculado = cambiaDibujo = pintar = planoInterseccion = ejeDibujando = normalesObtenidas = voxelesDibujando = seleccionarActivado = false;
+    dibujarEje = dibujarEjeDePrueba = dibujarAristas = dibujarVoxels =
+        contornoExterior = contornoInterior = invertido =
+        piezaCargada = ransacCalculado = cambiaDibujo =
+        pintarContorno = pintar = planoInterseccion =
+        ejeDibujando = normalesObtenidas = seleccionarActivado = moverPieza = false;
     modoDibujado = true;
+    mallaGirada = false;
+}
+
+void GLArea::CerrarProyecto(){
+    ResetearPieza();
+    emit setTextoInformacion("");
+    emit setStatusBar(tr("Proyecto cerrado"));
 }
 
 void GLArea::cambioModo(int mode){
-	drawmode=DrawMode(mode);
-	updateGL();
+        drawmode=DrawMode(mode);
+        updateGL();
 }
 
 void GLArea::loadMesh(QString fileName, int tipoArchivo)
@@ -112,6 +158,8 @@ void GLArea::loadMesh(QString fileName, int tipoArchivo)
               QMessageBox::warning(this,tr("Error importando el modelo PLY"),QString(errmsg));
             }
             initMesh("Importado \""+fileName+"\".");
+            vcg::tri::io::ImporterPLY<CMesh>::Open(meshExt,(fileName.toStdString()).c_str());
+            initMeshSecundarias();
     }else{
         int err=vcg::tri::io::Importer<CMesh>::Open(mesh,(fileName.toStdString()).c_str());
         if(err!=0){
@@ -123,14 +171,14 @@ void GLArea::loadMesh(QString fileName, int tipoArchivo)
 void GLArea::saveMesh(QString fileName, int tipoArchivo)
 {
    if(tipoArchivo==0){
-       int err=vcg::tri::io::ExporterPLY<CMesh>::Save(mesh,(fileName.toStdString()).c_str());
+       int err=vcg::tri::io::ExporterPLY<CMesh>::Save(figuraFinal,(fileName.toStdString()).c_str());
             if(err!=0){
               const char* errmsg=vcg::tri::io::ExporterPLY<CMesh>::ErrorMsg(err);
               QMessageBox::warning(this,tr("Error exportando el modelo PLY"),QString(errmsg));
             }
             initMesh("Exportado \""+fileName+"\".");
     }else{
-        int err=vcg::tri::io::Exporter<CMesh>::Save(mesh,(fileName.toStdString()).c_str());
+        int err=vcg::tri::io::Exporter<CMesh>::Save(figuraFinal,(fileName.toStdString()).c_str());
         if(err!=0){
         }
             initMesh("Exportado \""+fileName+"\".");
@@ -139,47 +187,45 @@ void GLArea::saveMesh(QString fileName, int tipoArchivo)
 
 void GLArea::cancelarSalir()
 {
-
 }
 
-void GLArea::loadTetrahedron(){
-    /*
-    vcg::tri::Tetrahedron(mesh);
-    dibujarNormales = normalesObtenidas = ejeDibujando = planoInterseccion = false;
-    initMesh(tr("Tetaedro [builtin]"));*/
-}
-
-void GLArea::dibujaPlano(){
-    planoInterseccion = !planoInterseccion;
-    if(planoInterseccion = true) cargarPlano();
-}
-
-void GLArea::cargarPlano(){
-    // puntos del plano
-    plano.Clear();
-    vcg::tri::Allocator<CMesh>::AddVertices(plano,3);
-    vcg::tri::Allocator<CMesh>::AddFaces(plano,2);
-
-    CMesh::VertexPointer ivp[3];
-    CMesh::VertexIterator vi=plano.vert.begin();
-    ivp[0]=&*vi;(*vi).P()=CMesh::CoordType ( 10.0, 0.0, 10.0); ++vi;
-    ivp[1]=&*vi;(*vi).P()=CMesh::CoordType (  0.0, 0.0,-10.0); ++vi;
-    ivp[2]=&*vi;(*vi).P()=CMesh::CoordType (-10.0, 0.0, 10.0); ++vi;
-
-    CMesh::FaceIterator fi=plano.face.begin();
-    (*fi).V(0)=ivp[0];  (*fi).V(1)=ivp[1]; (*fi).V(2)=ivp[2]; ++fi;
-    (*fi).V(0)=ivp[2];  (*fi).V(1)=ivp[1]; (*fi).V(2)=ivp[0];
-
+void GLArea::initMeshSecundarias(){
+    int dup = vcg::tri::Clean<CMesh>::RemoveDuplicateVertex(meshExt);
+    int unref =  vcg::tri::Clean<CMesh>::RemoveUnreferencedVertex(meshExt);
+    if (dup > 0 || unref > 0){
+           emit Imprimir(tr("Removed "));
+           emit Imprimir(QString::number(dup));
+           emit Imprimir(tr(" duplicate and "));
+           emit Imprimir(QString::number(unref));
+           emit Imprimir(tr(" unreferenced vertices from meshExt"));
+    }
     // update bounding box
-    vcg::tri::UpdateBounding<CMesh>::Box(plano);
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
     // update Normals
-    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(plano);
-    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(plano);
-    glWrapPlano.m = &plano;
-    glWrapPlano.Update();
-    updateGL();
-    
-    emit setStatusBar(tr("Plano cargado"));
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
+    CMesh::VertexIterator vi=meshExt.vert.begin();
+    do{
+    (*vi).P()=CMesh::CoordType ((*vi).P().X()-meshExt.bbox.Center().X(),
+                                (*vi).P().Y()-meshExt.bbox.Center().Y(),
+                                (*vi).P().Z()-meshExt.bbox.Center().Z()); ++vi;
+    }while(vi!=meshExt.vert.end());
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
+    // update Normals
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
+    float d=1.0f/meshExt.bbox.Diag();
+
+    vi=meshExt.vert.begin();
+    do{
+    (*vi).P()=CMesh::CoordType ((*vi).P().X()*d,
+                                (*vi).P().Y()*d,
+                                (*vi).P().Z()*d);++vi;
+    }while(vi!=meshExt.vert.end());
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
+    // update Normals
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
 }
 
 void GLArea::initMesh(QString message)
@@ -211,6 +257,7 @@ void GLArea::initMesh(QString message)
     vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(mesh);
     vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(mesh);
     float d=1.0f/mesh.bbox.Diag();
+    escala = d;
 
     vi=mesh.vert.begin();
     do{
@@ -235,9 +282,110 @@ void GLArea::initMesh(QString message)
     emit setStatusBar(message);
 }
 
+void GLArea::cambioExtInt(){
+    CMesh::VertexIterator vi, vi2;
+    CMesh::CoordType punto;
+    vcg::Quaternionf q1;
+
+    q1.FromAxis(PI,vcg::Point3f(0,1,0));
+    vi = meshExt.vert.begin();
+    do{
+    punto=CMesh::CoordType ((*vi).P().X(),
+                            (*vi).P().Y(),
+                            (*vi).P().Z());
+    punto=q1.Rotate(punto);
+    (*vi).P()=CMesh::CoordType (punto.X(),
+                                punto.Y(),
+                                punto.Z());
+    ++vi;
+    }while(vi!=meshExt.vert.end());
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
+    glWrapRaro.m = &meshExt;
+    glWrapRaro.Update();
+}
+
+void GLArea::invertirMalla(){
+    CMesh::VertexIterator vi, vi2;
+    CMesh::CoordType punto;
+    vcg::Quaternionf q1;
+
+    q1.FromAxis(PI,vcg::Point3f(0,0,1));
+    vi = meshExt.vert.begin();
+    do{
+    punto=CMesh::CoordType ((*vi).P().X(),
+                            (*vi).P().Y(),
+                            (*vi).P().Z());
+    punto=q1.Rotate(punto);
+    (*vi).P()=CMesh::CoordType (punto.X(),
+                                punto.Y(),
+                                punto.Z());
+    ++vi;
+    }while(vi!=meshExt.vert.end());
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
+    glWrapRaro.m = &meshExt;
+    glWrapRaro.Update();
+}
+
+void GLArea::girarMalla(){
+    float fi, theta, aux;
+    ejeFinal.Direction().ToPolar(aux,theta,fi);
+    CMesh::VertexIterator vi, vi2;
+    CMesh::CoordType punto;
+    vcg::Quaternionf q1,q2,q3,q5,q6;
+    float max = -10000, min = 10000;
+
+    q1.FromAxis(theta,vcg::Point3f(0,1,0));
+    q2.FromAxis(  -fi,vcg::Point3f(0,0,1));
+    q3.FromAxis(PI/2.,vcg::Point3f(0,0,1));
+    q5.FromAxis(anguloRotar*PI/180.,vcg::Point3f(0,1,0));
+    vi = meshExt.vert.begin();
+    do{
+    punto=CMesh::CoordType ((*vi).P().X()-ejeFinal.Origin().X(),
+                            (*vi).P().Y()-ejeFinal.Origin().Y(),
+                            (*vi).P().Z()-ejeFinal.Origin().Z());
+
+    punto=q1.Rotate(punto);
+    punto=q2.Rotate(punto);
+    punto=q3.Rotate(punto);
+    punto=CMesh::CoordType (punto.X(),
+                            punto.Y(),
+                            punto.Z());
+    punto=q5.Rotate(punto);
+
+    (*vi).P()=CMesh::CoordType (punto.X(),
+                                punto.Y(),
+                                punto.Z());
+    if(max < punto.Y())
+        max = punto.Y();
+    if(min > punto.Y())
+        min = punto.Y();
+    ++vi;
+    }while(vi!=meshExt.vert.end());
+
+    alturaCentrado = -(max-min)/2;
+     vi = meshExt.vert.begin();
+    do{
+    (*vi).P()=CMesh::CoordType ((*vi).P().X(),
+                                (*vi).P().Y()+alturaCentrado,
+                                (*vi).P().Z());
+    ++vi;
+    }while(vi!=meshExt.vert.end());
+
+    vcg::tri::UpdateBounding<CMesh>::Box(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(meshExt);
+    vcg::tri::UpdateNormals<CMesh>::PerFaceNormalized(meshExt);
+    glWrapRaro.m = &meshExt;
+    glWrapRaro.Update();
+    mallaGirada=true;
+}
+
 void GLArea::initializeGL ()
 {
-  glClearColor(0, 0, 0, 0); 
+  glClearColor(0, 0, 0, 0);
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
   glEnable(GL_NORMALIZE);
@@ -248,13 +396,95 @@ void GLArea::initializeGL ()
 
 void GLArea::resizeGL (int w, int h)
 {
-  glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
+  glViewport (0, 0, (GLsizei) w, (GLsizei) h);
   initializeGL();
  }
 
+void GLArea::verDibujoArqueologico(){
+    pintarContorno = true;
+    pintar = false;
+    dibujarEje = false;
+    updateGL();
+}
+
+void GLArea::verModeloReconstruido(){
+    pintarContorno = false;
+    pintar = true;
+    cambiaDibujo = true;
+    dibujarEje = false;
+    updateGL();
+}
+
 void GLArea::paintGL ()
 {
+    GLfloat posicionLuz[3];
+    posicionLuz[0] = 0;
+    posicionLuz[2] = 0;
+    posicionLuz[1] = 100000000;// Create light components
+    //glLightfv(GL_LIGHT0, GL_POSITION,posicionLuz);
+    aspectRatio = 1.0*GLArea::width()/ GLArea::height()*1.0;
+    if(pintarContorno){
+        glClearColor(1,1,1,1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        if(GLArea::width() > GLArea::height())
+            glOrtho(-(1/zoom)*aspectRatio, (1/zoom)*aspectRatio, -(1/zoom), (1/zoom), 0.1, 10);
+        else
+            glOrtho(-(1/zoom), (1/zoom), -(1/zoom)/aspectRatio, (1/zoom)/aspectRatio, 0.1, 10);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();//Dibujar el contorno cutre
+        gluLookAt(0,0,5,   0,0,0,   0,1,0);
+        glColor3f(0.2,0.2,0.2);
+        if(GLArea::width() > GLArea::height())
+            renderText(-(1/zoom)*aspectRatio+0.1/zoom,(1/zoom)-0.1/zoom,0,"¡¡¡Nombre de la pieza!!!",this->font());
+        else
+            renderText(-(1/zoom)+0.1/zoom,(1/zoom)/aspectRatio-0.1/zoom,0,"¡¡¡Nombre de la pieza!!!",this->font());
+
+        track.Reset();
+        track.center=vcg::Point3f(0, 0, 0);
+        track.radius= 10000;
+        track.GetView();
+        track.Apply(false);
+        glPushMatrix();
+            //PANCHITO 1
+            glTranslatef(leftright,updown,0);
+
+            glDisable(GL_LIGHTING);
+            glColor3f(0,0,0);
+            glEnable(GL_LINE_SMOOTH);
+            glLineWidth(0.2);
+            glBegin(GL_LINES);
+                glVertex3f(0,maxGlobal,0);
+                glVertex3f(0,minGlobal,0);
+
+                glVertex3f(0,maxGlobal,0);
+                glVertex3f(-distanciaMaxGlobal,maxGlobal,0);
+            glEnd();
+            renderText(-distanciaMaxGlobal,maxGlobal+0.01,0,QString::number(distanciaMaxGlobal/escala),this->font());//QFont("helvetica", 12, QFont::Bold, TRUE));
+            glPushMatrix();
+                glRotatef(90,0,0,1);
+                renderText(0,0,0,QString::number((maxGlobal + minGlobal)/escala),this->font());
+            glPopMatrix();
+            glDisable(GL_LINE_SMOOTH);
+            glColor3f(0,0,0);
+            glEnd();
+            glLineWidth(1);
+            glBegin(GL_LINE_STRIP);
+                foreach(PuntoContornoLight puntoActual, puntosObtenidos){
+                    glVertex3f(-puntoActual.distancia,
+                               puntoActual.altura,
+                               0);
+                }
+            glEnd();
+            glEnable(GL_LIGHTING);
+            glRotatef(-90+anguloPieza,0,1,0);
+            glWrapRaro.Draw<vcg::GLW::DMSmooth,   vcg::GLW::CMPerFace,vcg::GLW::TMNone> ();
+            glPopMatrix();
+        track.DrawPostApply();
+    }
     if(pintar){
+        glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -270,7 +500,6 @@ void GLArea::paintGL ()
         //float d=1.0f/mesh.bbox.Diag();
        // vcg::glScale(d);
         if(cambiaDibujo){ //Dibujar con la pieza reconstruida
-            if(modoDibujado) //¿Pieza reconstruida?
                 switch(drawmode)
                 {
                   case SMOOTH:
@@ -294,71 +523,51 @@ void GLArea::paintGL ()
                   default:
                         break;
                  }
-
-            glPushMatrix();
-            //Mover para que la pieza reconstruida quede centrada en el eje
-            glRotatef(90,1,0,0);
-            glTranslatef(0,-ejeFinal.Origin().Y(),0);
-            
-            //Dibujar el contorno cutre
-            glDisable(GL_LIGHTING);
-                glPointSize(3);
-            glColor3f(1,0.4,0.4);
-            glBegin(GL_POINTS);
-                    glVertex3f(puntosObtenidos.at(0).distancia*cos(0),
-                               puntosObtenidos.at(0).altura,
-                               puntosObtenidos.at(0).distancia*sin(0));
-            glEnd();
-            glColor3f(0.4,1,0.4);
-            glBegin(GL_POINTS);
-                for(int i=1; i<puntosObtenidos.size(); ++i){
-                    glVertex3f(puntosObtenidos.at(i).distancia*cos(0),
-                               puntosObtenidos.at(i).altura,
-                               puntosObtenidos.at(i).distancia*sin(0));
-                }
-            glEnd();
-            glColor3f(0.4,1,0.4);
-            glBegin(GL_LINE_STRIP);
-                for(int i=1; i<tamPuntosm; ++i){
-                    glVertex3f(puntosObtenidos.at(i).distancia*cos(0),
-                               puntosObtenidos.at(i).altura - 1,
-                               puntosObtenidos.at(i).distancia*sin(0));
-                }
-            glEnd();
-
-            glColor3f(0.4,1,0.4);
-            glBegin(GL_LINE_STRIP);
-                foreach(PuntoContornoLight puntoActual, puntosObtenidos){
-                    glVertex3f(puntoActual.distancia*cos(0),
-                               puntoActual.altura,
-                               puntoActual.distancia*sin(0));
-                }
-            glEnd();
-            glColor3f(0.4,1,0.4);
-            glBegin(GL_LINE_STRIP);
-                foreach(PuntoContornoLight puntoActual, puntosGrahamOrdenados){
-                    glVertex3f(puntoActual.distancia*cos(0),
-                               1 + puntoActual.altura,
-                               puntoActual.distancia*sin(0));
-                }
-            glEnd();
-            glColor3f(0.4,0.4,1);
-            glBegin(GL_LINES);
-                foreach(PuntoContornoLight puntoActual, puntosObtenidos){
-                    glVertex3f(puntosObtenidos.at(0).distancia*cos(0),
-                               puntosObtenidos.at(0).altura,
-                               2 + puntosObtenidos.at(0).distancia*sin(0));
-                    glVertex3f(puntoActual.distancia*cos(0),
-                               puntoActual.altura,
-                               2 + puntoActual.distancia*sin(0));
-                }
-            glEnd();
-            glEnable(GL_LIGHTING);
-            glPopMatrix();
         }else{ //Dibujar ANTES de reconstruir
             if(planoInterseccion) //Dibujar plano de prueba
                 glWrapPlano.Draw<vcg::GLW::DMFlat, vcg::GLW::CMPerFace, vcg::GLW::TMNone> ();
             if(dibujarEje){
+                glPushMatrix();
+                glColor3f(0,1,0);
+                glDisable(GL_LIGHTING);
+                glEnable(GL_LINE_SMOOTH);
+                glLineWidth(1.7);
+                if(contornoExterior)
+                for(int i=0; i<numContornos; ++i){
+                    glBegin(GL_LINE_STRIP);
+                    foreach(puntoContorno puntoActual, contornos[i])
+                        glVertex3f(puntoActual.getPosicion().X(),puntoActual.getPosicion().Y(),puntoActual.getPosicion().Z());
+                    glEnd();
+                }
+                if(contornoInterior)
+                    for(int i=0; i<numContornosInt; ++i){
+                        glBegin(GL_LINE_STRIP);
+                        foreach(puntoContorno puntoActual, contornosInt[i])
+                            glVertex3f(puntoActual.getPosicion().X(),puntoActual.getPosicion().Y(),puntoActual.getPosicion().Z());
+                        glEnd();
+                    }
+                glEnable(GL_LIGHTING);
+                glDisable(GL_LINE_SMOOTH);
+
+                float fi, theta, aux;
+                ejeFinal.Direction().ToPolar(aux,theta,fi);
+                fi = fi*180./PI;
+                theta = theta*180./PI;
+                glColor3f(0,0,1);
+                glColor3f(1,0,0);
+                if(invertido)
+                    glRotatef(180,0,0,1);
+                if(contornoExterior)
+                    glRotatef(anguloRotar,0,1,0);
+                if(contornoInterior)
+                    glRotatef(anguloRotar+180,0,1,0);
+
+                glTranslatef(0,alturaCentrado+alturaExtra,0);
+                glRotatef(0,1,0,0);
+                glRotatef(90,0,0,1);
+                glRotatef(-fi,0,0,1);
+                glRotatef(theta,0,1,0);
+                glTranslatef(-ejeFinal.Origin().X(),-ejeFinal.Origin().Y(),-ejeFinal.Origin().Z());
                 glPushMatrix();
                 glDisable(GL_LIGHTING);
                 glColor3f(0,1,0);
@@ -418,7 +627,6 @@ void GLArea::paintGL ()
                 glPopMatrix();
             }
             if(dibujarVoxels){ //Dibujar vóxeles
-                if(voxelesDibujando){
                     glDisable(GL_LIGHTING);
                     glBegin(GL_POINTS);
                     foreach(Voxel voxel, voxels){
@@ -444,8 +652,6 @@ void GLArea::paintGL ()
                     }
                     glEnd();
                     glEnable(GL_LIGHTING);
-                        //                glWrapEje.Draw<vcg::GLW::DMFlatWire, vcg::GLW::CMNone, vcg::GLW::TMNone> ();
-                }
             }
             // vcg::glTranslate(-glWrap.m->bbox.Center());
             if(dibujarNormales){ //Dibuja las normales
@@ -465,14 +671,8 @@ void GLArea::paintGL ()
                 glPopMatrix();
             }
             glPushMatrix();
-            glColor3f(0,1,0);
-            glBegin(GL_LINE_STRIP);
-            foreach(puntoContorno puntoActual, contorno){ //Dibuja el contorno seleccionado
-                glVertex3f(puntoActual.getPosicion().X(),puntoActual.getPosicion().Y(),puntoActual.getPosicion().Z());
-            }
-            glEnd();
             glPopMatrix();
-            if(dibujarAristas){
+            if(false /*dibujarAristas*/){
                 glColor3f(1,0,0);
                 glEnable(GL_POINT_SMOOTH);
                 glDisable(GL_LIGHTING);
@@ -512,8 +712,8 @@ void GLArea::paintGL ()
 
 
             }
-            if(modoDibujado)
-                if(true){//Dibujar bounding box
+            if(modoDibujado){
+                if(false){//Dibujar bounding box
                     glEnable(GL_POINT_SMOOTH);
                     glDisable(GL_LIGHTING);
                     glPointSize(3);
@@ -531,8 +731,7 @@ void GLArea::paintGL ()
                     glDisable(GL_POINT_SMOOTH);
                     glEnable(GL_LIGHTING);
                 }
-                switch(drawmode)
-                { //Dibuja pieza sin reconstruir
+                switch(drawmode){ //Dibuja pieza sin reconstruir
                   case SMOOTH:
                         glWrap.Draw<vcg::GLW::DMSmooth,   vcg::GLW::CMPerFace,vcg::GLW::TMNone> ();
                         break;
@@ -553,12 +752,15 @@ void GLArea::paintGL ()
                         break;
                   default:
                         break;
-                 }
+                }
+            }
+            if(dibujarEje)
+                glPopMatrix();
         }
         glPopMatrix();
         track.DrawPostApply();
     }
-} 
+}
 
 void GLArea::keyReleaseEvent (QKeyEvent * e)
 {
@@ -581,6 +783,20 @@ void GLArea::keyPressEvent (QKeyEvent * e)
     track.ButtonDown (QT2VCG (Qt::NoButton, Qt::ShiftModifier));
   if (e->key () == Qt::Key_Alt)
     track.ButtonDown (QT2VCG (Qt::NoButton, Qt::AltModifier));
+  if(pintarContorno){
+      if (e->key () == Qt::Key_Plus)
+          zoom+=0.2;
+      if (e->key () == Qt::Key_Minus)
+          zoom-=0.2;
+      if (e->key () == Qt::Key_Right)
+          leftright+=0.1;
+      if (e->key () == Qt::Key_Left)
+          leftright-=0.1;
+      if (e->key () == Qt::Key_Up)
+          updown+=0.1;
+      if (e->key () == Qt::Key_Down)
+          updown-=0.1;
+  }
   updateGL ();
 }
 
@@ -588,16 +804,33 @@ void GLArea::mousePressEvent (QMouseEvent * e)
 {
   e->accept ();
   setFocus ();
-  if(seleccionarActivado){
+  if(moverPieza){
+      anguloOld = anguloPieza;
+      ratonXOld = e->x();
+  }else if(seleccionarActivado){
         if(e->buttons()&Qt::RightButton){
-            track.MouseDown (e->x (), height () - e->y (), QT2VCG (Qt::LeftButton, e->modifiers ()));
+            if(dibujarEje){
+                //alturaExtraOld = alturaExtra;
+                track.MouseDown (e->x (), height ()- e->y (), QT2VCG (Qt::MidButton, e->modifiers ()));
+            }else
+                track.MouseDown (e->x (), height () - e->y (), QT2VCG (Qt::MidButton, e->modifiers ()));
             botonIzquierdo = false;
         }else{
+        if(contornoExterior)
+            numContornos++;
+        if(contornoInterior)
+            numContornosInt++;
+        ComprobarContornos();
             clickado(e->x(), height() - e->y());
             botonIzquierdo = true;
         }
   }else
-        track.MouseDown (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
+      if(dibujarEje){
+          alturaExtraOld = alturaExtra;
+          ratonYOld = e->y();
+          track.MouseDown (e->x (), height ()/2, QT2VCG (e->button (), e->modifiers ()));
+      }else
+          track.MouseDown (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
 
   updateGL ();
 }
@@ -605,29 +838,46 @@ void GLArea::mousePressEvent (QMouseEvent * e)
 void GLArea::mouseMoveEvent (QMouseEvent * e)
 {
   if (e->buttons ()) {
-      if(seleccionarActivado)
+  if(moverPieza){
+    anguloPieza = anguloOld + (e->x() - ratonXOld);
+    if(anguloPieza < -45) anguloPieza = -45;
+    if(anguloPieza > 45) anguloPieza = 45;
+  }
+      if(seleccionarActivado){
         if(botonIzquierdo)
             clickado(e->x(), height() - e->y());
-        else
+        else if(dibujarEje){
+                track.MouseMove(e->x (), height () - e->y ());
+            }else{
+                track.MouseMove(e->x (), height () - e->y ());
+            }
+        }else if(dibujarEje){
+            alturaExtra = alturaExtraOld - alreves*(e->y() - ratonYOld)/height();
+            track.MouseMove(e->x (), height ()/2);
+        }else{
             track.MouseMove(e->x (), height () - e->y ());
-      else
-        track.MouseMove (e->x (), height () - e->y ());
-    updateGL ();
+        }
     }else{
         emit RatonEnGLArea();
     }
+
+    updateGL ();
 }
 
 void GLArea::mouseReleaseEvent (QMouseEvent * e)
 {
+    if(seleccionarActivado)
+        if(botonIzquierdo)
+            clickado(e->x(), height() - e->y());
+        else if(dibujarEje){
+            track.MouseUp (e->x (), height () - e->y (), QT2VCG (Qt::MidButton, e->modifiers ()));
+        }else
+            track.MouseUp (e->x (), height () - e->y (), QT2VCG (Qt::MidButton, e->modifiers ()));
+    else if(dibujarEje){
+        track.MouseUp (e->x (), height ()/2, QT2VCG (e->button (), e->modifiers ()));
+    }else
+        track.MouseUp (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
 
-  if(seleccionarActivado)
-    if(botonIzquierdo)
-        clickado(e->x(), height() - e->y());
-    else
-        track.MouseUp (e->x (), height () - e->y (), QT2VCG (Qt::LeftButton, e->modifiers ()));
-  else
-    track.MouseUp (e->x (), height () - e->y (), QT2VCG (e->button (), e->modifiers ()));
   updateGL ();
 }
 
@@ -648,13 +898,32 @@ void GLArea::calcularEje(){
         parametros[0] = 1000;
     else
         parametros[0] = 1500;
-    parametros[1] = 40;
+    parametros[1] = 60;
     parametros[2] = 90;
     parametros[3] = 50;
     parametros[4] = 1000;
     parametros[5] = 10;
     parametros[6] = 0;
     emit CrearConfiguracionEje(parametros);
+}
+
+void GLArea::calcularInicializarEje(){
+    int * parametros = new int [7];
+    if(numCaras < 10000)
+        parametros[0] = 10;
+    else if(numCaras < 100000)
+        parametros[0] = 50;
+    else if(numCaras < 1000000)
+        parametros[0] = 1000;
+    else
+        parametros[0] = 1500;
+    parametros[1] = 60;
+    parametros[2] = 90;
+    parametros[3] = 50;
+    parametros[4] = 1000;
+    parametros[5] = 10;
+    parametros[6] = 0;
+    inicializarEje(parametros[0],parametros[1],parametros[2],parametros[3],parametros[4],parametros[5],parametros[6],true,true,parametros[9]);
 }
 
 void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje){
@@ -783,141 +1052,92 @@ void GLArea::seleccionar(){
     seleccionarActivado = !seleccionarActivado;
 }
 
-void GLArea::CalcularContorno(bool entera){
+void GLArea::seleccionarExterior(bool valor){
+    seleccionarActivado = contornoExterior = valor;
+    alturaExtra = 0;
+    track.Reset();
+    updateGL();
+}
 
-    int numPuntos, numPuntos2, numElementos;
-    float alturaAlta = puntoAlto.getAltura(), alturaBaja = puntoBajo.getAltura(), saltoAltura = (alturaAlta - alturaBaja)/10., altura;
-    float distanciaMin, distanciaMax, distancia;
-    puntoContorno punto1, punto2;
-    vcg::Point3f puntoEje = vcg::ClosestPoint(ejeFinal,puntoAlto.getPosicion());
+void GLArea::seleccionarInterior(bool valor){
+    seleccionarActivado = contornoInterior = valor;
+    if(mallaGirada) cambioExtInt();
+    alturaExtra = 0;
+    track.Reset();
+    updateGL();
+}
+
+void GLArea::Generar(){
+    CalcularContorno();
+    cambiaDibujo=!cambiaDibujo;
+    pintarContorno = !pintarContorno;
+    pintar=!pintar;
+    updateGL();
+}
+
+void GLArea::CalcularContorno(){
     contornoOrdenado.clear();
-    QMap<float, PuntoContornoLight> puntosLaterales;
     PuntoContornoLight puntoInsertando;
-    QList<PuntoContornoLight> listaLaterales;
-    QList<float> listaAlturas;
-    QMap<float, float> puntosAlturas;
-    QMap<float, puntoContorno>::iterator itAlturas;
-    QList<PuntoContornoLight>::iterator itPuntos;
     puntoContorno puntoNuevo;
-    int contandito = 0, contadorPuntos = 0;
-        emit Imprimir("\n Altura baja: "+QString::number(alturaBaja));
-    foreach(puntoContorno punto, contornoAlturas){
-        emit Imprimir("\n Altura: "+QString::number(puntoInsertando.altura));
-        puntoInsertando.altura = punto.altura - alturaBaja;
-        puntoInsertando.distancia = punto.distancia;
+    float alturaMin = 1000000, alturaMax = -1000000;
+
+    for(int i=0; i<numContornos; ++i){
+        foreach(puntoContorno p, contornos[i]){
+            contornoAlturas.insert(p.altura,p);
+            if(p.altura < alturaMin)
+                alturaMin = p.altura;
+            if(p.altura > alturaMax)
+                alturaMax = p.altura;
+        }
+    }
+
+    for(int i=0; i<numContornosInt; ++i){
+        foreach(puntoContorno p, contornosInt[i]){
+            contornoAlturasInt.insert(-p.altura,p);
+            if(p.altura < alturaMin)
+                alturaMin = p.altura;
+            if(p.altura > alturaMax)
+                alturaMax = p.altura;
+        }
+    }
+    //PANCHITO 2
+
+    contorno = contornoAlturas.values();
+    contornoInt = contornoAlturasInt.values();
+
+    float alturaAniadir = alturaMax - alturaMin;
+    alturaAniadir = alturaAniadir / 2.;
+
+    minGlobal = 0;
+    maxGlobal = 0;
+    foreach(puntoContorno p, contorno){
+        puntoInsertando.altura = p.altura-alturaMin-alturaAniadir;
+        puntoInsertando.distancia = p.distancia;
+        //cout << "altura " << p.altura << "  distancia " << p.distancia << endl;
+        if( puntoInsertando.altura < minGlobal)
+            minGlobal =  puntoInsertando.altura;
+        if( puntoInsertando.altura > maxGlobal){
+            maxGlobal =  puntoInsertando.altura;
+            distanciaMaxGlobal = puntoInsertando.distancia;
+        }
         puntosObtenidos.append(puntoInsertando);
     }
-    alturaAlta -= alturaBaja;
-    alturaBaja = 0;
-    puntosGrahamOrdenados = puntosObtenidos;
-    tamPuntosm = GrahamScan(puntosObtenidos);
-
-    //emit Imprimir("\n AlturaBaja: "+QString::number(alturaBaja) + " AlturaAlta: "+QString::number(alturaAlta)+ " SaltoAltura: "+QString::number(saltoAltura));
-/*
-    emit Imprimir("\n Imprimiendo valores");
-
-    foreach(PuntoContornoLight punto, puntosObtenidos)
-        emit Imprimir("\n" + QString::number(punto.altura) + "\t" + QString::number(punto.distancia));
-
-
-    GrahamScan(puntosObtenidos);
-
-    emit Imprimir("\n Imprimiendo valores");
-
-    foreach(PuntoContornoLight punto, puntosObtenidos)
-        emit Imprimir("\n" + QString::number(punto.altura) + "\t" + QString::number(punto.distancia));
-
-
-    QList<PuntoContornoLight> puntos;
-    PuntoContornoLight p0;
-    puntos.append(puntosObtenidos);
-    int m = 1;
-    int i = 2;
-    while(i<puntos.size()){
-        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
-                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
-                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
-                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
-                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
-        while(m >= 1 && DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i]) < 0){
-        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
-                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
-                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
-                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
-                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
-            m--;
+    foreach(puntoContorno p, contornoInt){
+        puntoInsertando.altura = p.altura-alturaMin-alturaAniadir;
+        puntoInsertando.distancia = p.distancia;
+        //cout << "altura " << p.altura << "  distancia " << p.distancia << endl;
+        if( puntoInsertando.altura < minGlobal)
+            minGlobal =  puntoInsertando.altura;
+        if( puntoInsertando.altura > maxGlobal){
+            maxGlobal =  puntoInsertando.altura;
+            distanciaMaxGlobal = puntoInsertando.distancia;
         }
-        emit Imprimir("\nPuntos: " + QString::number(m-1) + " " + QString::number(m) + " " + QString::number(i) +
-                      "\n" + QString::number(puntos[m-1].altura) + " " + QString::number(puntos[m-1].distancia) +
-                      "\n" + QString::number(puntos[m].altura) + " " + QString::number(puntos[m].distancia) +
-                      "\n" + QString::number(puntos[i].altura) + " " + QString::number(puntos[i].distancia) +
-                      " " + QString::number(DireccionProductoVectorial(puntos[m-1],puntos[m],puntos[i])));
-        m++;
-        p0 = puntos[m];
-        puntos.replace(m,puntos[i]);
-        puntos.replace(i,p0);
-        i++;
+        puntosObtenidos.append(puntoInsertando);
     }
 
-    puntosObtenidos.clear();
-    for(int i=0; i<m; ++i)
-        puntosObtenidos.append(puntos.at(i));
+    GenerarPieza(50);
+   // FiltrarPuntos(puntosObtenidos);
 
-    emit Imprimir ("\nTamanio de esta cosa\n" + QString::number(puntosGrahamOrdenados.size()) + "\n");
-
-
-    for(float altura = alturaBaja; altura <= alturaAlta; altura+=saltoAltura){
-        puntosLaterales.clear();
-        contandito++;
-        itAlturas = contornoAlturas.begin();
-        distanciaMin = 100000;
-        distanciaMax = -1;
-        puntosLaterales.clear();
-        numElementos = 0;
-        while(itAlturas->getAltura() < altura){
-            distancia = itAlturas->getDistancia();
-            altura = itAlturas->getAltura();
-            if(distancia < distanciaMin)
-                distanciaMin = distancia;
-            if (distancia > distanciaMax)
-                distanciaMax = distancia;
-            puntoInsertando.altura = altura;
-            puntoInsertando.distancia = distancia;
-            puntosLaterales.insert(distancia,puntoInsertando);
-            itAlturas = contornoAlturas.erase(itAlturas);
-            numElementos ++;
-        }
-            emit Imprimir("Num elementos: " + QString::number(numElementos) + "\n");
-            listaLaterales = puntosLaterales.values();
-        if(numElementos == 1){
-            puntosGrahamOrdenados.append(puntoInsertando);
-        }else if(numElementos == 2){
-            puntosGrahamOrdenados.append(listaLaterales);
-        }else if(numElementos > 2){
-            distancia = distanciaMin + (distanciaMax-distanciaMin)/2.;
-            foreach(PuntoContornoLight punto, listaLaterales){
-                emit Imprimir("\n" + QString::number(punto.distancia));
-            }
-            numPuntos = 0;
-            puntosAlturas.clear();
-            for(numPuntos = 0; listaLaterales.at(numPuntos).distancia < distancia && numPuntos < listaLaterales.size();++numPuntos){
-                puntosAlturas.insertMulti(listaLaterales.at(numPuntos).altura ,listaLaterales.at(numPuntos).altura);
-            }
-            listaAlturas = puntosAlturas.values();
-            puntosAlturas.clear();
-            puntoInsertando.distancia = listaLaterales.at((int) numPuntos/2).distancia;
-            puntoInsertando.altura = listaLaterales.at((int) numPuntos/2).altura;
-            puntosGrahamOrdenados.append(puntoInsertando);
-            for(numPuntos2 = 0; numPuntos2 < numPuntos; numPuntos2++){
-                puntosAlturas.insert(listaLaterales.at(numPuntos + numPuntos2).altura, listaLaterales.at(numPuntos + numPuntos2).altura);
-            }
-            listaAlturas = puntosAlturas.values();
-            puntoInsertando.distancia = listaAlturas.at(numPuntos + (int) numPuntos2/2);
-            puntoInsertando.altura = listaAlturas.at((int) numPuntos2/2);
-            puntosGrahamOrdenados.append(puntoInsertando);
-        }
-    }
-*/
     /*
     if(entera)
         GenerarPiezaEntera(50);
@@ -1049,7 +1269,7 @@ void GLArea::GenerarPiezaEntera(int n){
 }
 
 void GLArea::GenerarPieza(int n){
-    int numContornoVertices = contornoOrdenado.size() ;
+    int numContornoVertices = puntosObtenidos.size() ;
     int numVertices = (numContornoVertices)*n+2;
     int numFaces = (numContornoVertices)*n*2;
     float anguloRadianes = 3.1415*2./n;
@@ -1063,39 +1283,39 @@ void GLArea::GenerarPieza(int n){
     int contador = 0;
     for(int i = 0; i < n; ++i){
 
-        foreach(puntoContorno puntito, contornoOrdenado){
-            ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (puntito.getDistancia()*cos(anguloRadianes*i),
-                                                           puntito.getAltura(),
-                                                           puntito.getDistancia()*sin(anguloRadianes*i));
+        foreach(PuntoContornoLight puntito, puntosObtenidos){
+            ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (puntito.distancia*cos(anguloRadianes*i),
+                                                           puntito.altura,
+                                                           puntito.distancia*sin(anguloRadianes*i));
             ++vi;++contador;
         }
     }
 
 
-    ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (0, contornoOrdenado.begin()->getAltura(),  0); ++vi;++contador;
-    ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (0, (contornoOrdenado.end()-2)->getAltura(), 0); ++vi;++contador;
+    ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (0, puntosObtenidos.begin()->altura,  0); ++vi;++contador;
+    ivp[contador]=&*vi;(*vi).P()=CMesh::CoordType (0, (puntosObtenidos.end()-2)->altura, 0); ++vi;++contador;
 
     CMesh::FaceIterator fi=figuraFinal.face.begin();
     for(int i=0; i<n-1; ++i){
         for(int j=0; j<numContornoVertices-1; ++j){
-            (*(fi)).C() = vcg::Color4b::Green;
+            //(*(fi)).C() = vcg::Color4b::Green;
             (*fi).V(0)=ivp[numContornoVertices* i    + j];
             (*fi).V(1)=ivp[numContornoVertices* i    + j+1];
             (*fi).V(2)=ivp[numContornoVertices*(i+1) + j+1];
             ++fi;
-            (*(fi)).C() = vcg::Color4b::Green;
+            //(*(fi)).C() = vcg::Color4b::Green;
             (*fi).V(0)=ivp[numContornoVertices* i    + j];
             (*fi).V(1)=ivp[numContornoVertices*(i+1) + j+1];
             (*fi).V(2)=ivp[numContornoVertices*(i+1) + j];
             ++fi;
         }
 
-        (*(fi)).C() = vcg::Color4b::Blue;
+       // (*(fi)).C() = vcg::Color4b::Blue;
         (*fi).V(0)=ivp[numContornoVertices*n];
         (*fi).V(1)=ivp[numContornoVertices*(i)];
         (*fi).V(2)=ivp[numContornoVertices*(i+1)];
         ++fi;
-        (*(fi)).C() = vcg::Color4b::Blue;
+      //  (*(fi)).C() = vcg::Color4b::Blue;
         (*fi).V(0)=ivp[numContornoVertices*(i+2) - 1];
         (*fi).V(1)=ivp[numContornoVertices*(i+1) - 1];
         (*fi).V(2)=ivp[numContornoVertices*n + 1];
@@ -1104,24 +1324,24 @@ void GLArea::GenerarPieza(int n){
 
 
     for(int j=0; j<numContornoVertices-1; ++j){
-        (*(fi)).C() = vcg::Color4b::Red;
+       // (*(fi)).C() = vcg::Color4b::Red;
         (*fi).V(0)=ivp[numContornoVertices*(n-1) + j];
         (*fi).V(1)=ivp[numContornoVertices*(n-1) + j+1];
         (*fi).V(2)=ivp[j+1];
         ++fi;
-        (*(fi)).C() = vcg::Color4b::Red;
+       // (*(fi)).C() = vcg::Color4b::Red;
         (*fi).V(0)=ivp[numContornoVertices*(n-1) + j];
         (*fi).V(1)=ivp[j+1];
         (*fi).V(2)=ivp[j];
         ++fi;
     }
 
-    (*(fi)).C() = vcg::Color4b::Yellow;
+ //   (*(fi)).C() = vcg::Color4b::Yellow;
     (*fi).V(0)=ivp[numContornoVertices*n];
     (*fi).V(1)=ivp[numContornoVertices*(n-1)];
     (*fi).V(2)=ivp[0];
     ++fi;
-    (*(fi)).C() = vcg::Color4b::Yellow;
+//    (*(fi)).C() = vcg::Color4b::Yellow;
     (*fi).V(0)=ivp[numContornoVertices-1];
     (*fi).V(1)=ivp[numContornoVertices*(n-1) + numContornoVertices-1];
     (*fi).V(2)=ivp[numContornoVertices*n + 1];
@@ -1135,74 +1355,74 @@ void GLArea::GenerarPieza(int n){
     glFigura.m = &figuraFinal;
     glFigura.Update();
     updateGL();
+}
 
-    emit setStatusBar(tr("Pieza generada"));
+void GLArea::ResetContorno(){
+    for(int i=0; i<numContornos; ++i)
+        contornos[i].clear();
+    for(int i=0; i<numContornosInt; ++i)
+        contornosInt[i].clear();
+    numContornos = numContornosInt = 0;
+    updateGL();
+}
+
+
+void GLArea::deshacerContorno(){
+    if(contornoExterior){
+        contornos[numContornos-1].clear();
+        numContornos--;
+    }
+    if(contornoInterior){
+        contornosInt[numContornosInt-1].clear();
+        numContornosInt--;
+    }
+    updateGL();
 }
 
 void GLArea::clickado(int posx, int posy){
     std::vector<CMesh::FacePointer> resultadoSeleccion;
- /*   if(modoEje == -1){
-        vcg::GLPickTri<CMesh>::PickFace(posx,posy,mesh,resultadoSeleccion);
-        for(int i = 0; i < resultadoSeleccion.size(); ++i){
-            (*(resultadoSeleccion[i])).C() = vcg::Color4b::Blue;
-            if(!carasSeleccionadas.contains(resultadoSeleccion[i]))
-                carasSeleccionadas.append(resultadoSeleccion[i]);
+    puntoContorno punto;
+    vcg::Point3f puntoEje, nuevoPunto, incrementoPunto;
+    vcg::Line3f ejeY (vcg::Point3f(0,-1000,0),vcg::Point3f(0,1000,0));
+    float altura, distancia;
+    vcg::GLPickTri<CMesh>::PickFace(posx,posy,meshExt,resultadoSeleccion);
+    cout << resultadoSeleccion.size() << "<<<<<<\n";
+    for(int i = 0; i < 1 && i < resultadoSeleccion.size(); ++i){
+        vcg::Triangle3<float> triang ((*(resultadoSeleccion[i])).P(0),
+                                      (*(resultadoSeleccion[i])).P(1),
+                                      (*(resultadoSeleccion[i])).P(2));
+        nuevoPunto = vcg::Barycenter(triang);
+        punto.setPosicion(nuevoPunto);
+        puntoEje = vcg::ClosestPoint(ejeY,nuevoPunto);
+        incrementoPunto = puntoEje - ejeY.Origin();
+        altura = sqrt(pow(incrementoPunto.X(),2)+
+                      pow(incrementoPunto.Y(),2)+
+                      pow(incrementoPunto.Z(),2));
+        altura = incrementoPunto.Norm();
+        distancia = vcg::Distance(ejeY,nuevoPunto);
+        punto.setAltura(altura);
+        punto.setNumPunto(numPuntoContorno);
+        punto.setDistancia(distancia);
+        if(contornoExterior){
+            contornos[numContornos-1].push_back(punto);
+        }if(contornoInterior){
+            contornosInt[numContornosInt-1].push_back(punto);
         }
-    }else{*/
-        puntoContorno punto;
-        vcg::Point3f puntoEje, nuevoPunto, incrementoPunto;
-        float altura, distancia;
-        vcg::GLPickTri<CMesh>::PickFace(posx,posy,mesh,resultadoSeleccion);
-        for(int i = 0; i < 1 && i < resultadoSeleccion.size(); ++i){
-            (*(resultadoSeleccion[i])).C() = vcg::Color4b::Red;
-            vcg::Triangle3<float> triang ((*(resultadoSeleccion[i])).P(0),
-                                          (*(resultadoSeleccion[i])).P(1),
-                                          (*(resultadoSeleccion[i])).P(2));
-            nuevoPunto = vcg::Barycenter(triang);
-            punto.setPosicion(nuevoPunto);
-            puntoEje = vcg::ClosestPoint(ejeFinal,nuevoPunto);
-            incrementoPunto = puntoEje - ejeFinal.Origin();
-            altura = sqrt(pow(incrementoPunto.X(),2)+
-                          pow(incrementoPunto.Y(),2)+
-                          pow(incrementoPunto.Z(),2));
-            altura = incrementoPunto.Norm();
-            distancia = vcg::Distance(ejeFinal,nuevoPunto);
-            punto.setAltura(altura);
-            punto.setNumPunto(numPuntoContorno);
-            punto.setDistancia(distancia);
-            contornoAlturas.insert(altura,punto);
-            contorno.push_back(punto);
-            if(altura > puntoAlto.getAltura()){
-                puntoAlto.setAltura(altura);
-                puntoAlto.setDistancia(distancia);
-                puntoAlto.setNumPunto(numPuntoContorno);
-                puntoAlto.setPosicion(nuevoPunto);
-            }else if(altura < puntoBajo.getAltura()){
-                puntoBajo.setAltura(altura);
-                puntoBajo.setDistancia(distancia);
-                puntoBajo.setNumPunto(numPuntoContorno);
-                puntoBajo.setPosicion(nuevoPunto);
-            }
-            numPuntoContorno++;
+        if(altura > puntoAlto.getAltura()){
+            puntoAlto.setAltura(altura);
+            puntoAlto.setDistancia(distancia);
+            puntoAlto.setNumPunto(numPuntoContorno);
+            puntoAlto.setPosicion(nuevoPunto);
+        }else if(altura < puntoBajo.getAltura()){
+            puntoBajo.setAltura(altura);
+            puntoBajo.setDistancia(distancia);
+            puntoBajo.setNumPunto(numPuntoContorno);
+            puntoBajo.setPosicion(nuevoPunto);
         }
-    //}
+        numPuntoContorno++;
+    }
+    emit ContornoEmpiezaACalcularse();
     updateGL();
-}
-
-float GLArea::Angulo(vcg::Point3f punto1, vcg::Point3f punto2){
-    vcg::Point3f punto_1, punto_2;
-    vcg::Plane3f plano (0,ejeFinal.Direction());
-    punto_1 = plano.Projection(punto1);
-    punto_2 = plano.Projection(punto2);
-    float angulo = acosf((punto_1.X()*punto_2.X()+
-                  punto_1.Y()*punto_2.Y())
-                 /
-                 (sqrt(pow(punto_1.X(),2)+pow(punto_1.Y(),2))*
-                  sqrt(pow(punto_2.X(),2)+pow(punto_2.Y(),2))));
-    if(punto_2.X() < punto_1.X())
-        return angulo;
-    else
-        return -angulo;
 }
 
 void GLArea::cambiaValor(int valor){
@@ -1216,12 +1436,215 @@ void GLArea::cambiaValor(int valor){
 
 void GLArea::alternarDibujoEje(){
     dibujarEje = !dibujarEje;
+    track.Reset();
     updateGL();
 }
 
 void GLArea::alternarDibujoVoxels(){
     dibujarVoxels = !dibujarVoxels;
     updateGL();
+}
+
+void GLArea::continuarRANSAC(){
+    if(ransacCalculado){
+        hebra->setOperacion(1);
+        hebra->insertarVoxels(voxels);
+        hebra->start();
+    }else
+        emit setStatusBar(tr("No se puede continuar calculando RANSAC si no se ha iniciado a calcular"));
+}
+
+void GLArea::AdaptarEje(){
+    vcg::Point3f puntoMin, puntoMax, puntoCandidato, puntoEje;
+    float distanciaNeg, distanciaPos, dis;
+    distanciaNeg = 10000;
+    distanciaPos = -10000;
+    CMesh::VertexIterator vi=glWrap.m->vert.begin();
+    do{
+        puntoCandidato = vcg::Point3f((*vi).P());
+        puntoEje = vcg::ClosestPoint(ejeFinal,puntoCandidato);
+        puntoCandidato = ejeFinal.Origin() - puntoEje;
+        dis = puntoCandidato.Norm();
+        if(dis < distanciaNeg){
+            distanciaNeg = dis;
+            puntoMin = puntoEje;
+        }
+        if(dis > distanciaPos){
+            distanciaPos = dis;
+            puntoMax = puntoEje;
+        }
+        ++vi;
+    }while(vi!=glWrap.m->vert.end());
+    ejeFinal.Set(puntoMax,(puntoMin-puntoMax));
+}
+
+void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFinal, vcg::Point3f nodoRaizFinal, int maxInterseccionVoxelFinal, vcg::Line3f ejeFinalFinal){
+    float calidad;
+    voxels = voxelsFinal;
+    valorMedio = valorMedioFinal;
+    nodoRaiz = nodoRaizFinal;
+    maxInterseccionVoxel = maxInterseccionVoxelFinal;
+    ejeFinal = ejeFinalFinal;
+    AdaptarEje();
+    emit ajustarMaximoVoxeles(maxInterseccionVoxel);
+    valorColorVoxel = maxInterseccionVoxel - cantidadDeIntersecciones;
+    valorColorVoxel = valorColorVoxel / 7;
+    if(valorColorVoxel <= 0) valorColorVoxel = 1;
+
+    if(realizarGenetico)
+        calidad = calidadDelEje();
+    else
+        calidad = -1;
+
+    calidadAnterior = calidad;
+    emit Imprimir("\nLa calidad del eje: " + QString::number(calidad) + " y el tamanio del mismo " + QString::number(ejeFinal.Direction().Norm()));
+    if(calidad>=0){
+        dibujarAristas = true;
+    }
+    noMejora = false;
+    estadoDelCalculo = 1;
+    dibujarEje = true;
+    track.Reset();
+    anguloRotar = atan2(puntoOrigen.Y(),puntoOrigen.Z())*180./PI - 180;
+    girarMalla();
+    EmitirInformacionEje();
+    emit activaBotonContorno();
+}
+
+void GLArea::cargandoEje(float * valor){
+    vcg::Point3f origen(valor[0],valor[1],valor[2]);
+    vcg::Point3f direccion(valor[3],valor[4],valor[5]);
+    anguloRotar = valor[6];
+    anguloPieza = valor[7];
+    ejeFinal.Set(origen,direccion);
+    girarMalla();
+    dibujarEje = true;
+    track.Reset();
+    estadoDelCalculo = 1;
+}
+
+void GLArea::cargandoContorno(float * valor){
+    int tamanioValor = valor[0];
+    PuntoContornoLight punto;
+    for(int i=1; i<tamanioValor; i=i+2){
+        punto.distancia = valor[i];
+        punto.altura = valor[i+1];
+        puntosObtenidos.append(punto);
+    }
+    verDibujoArqueologico();
+    estadoDelCalculo = 2;
+}
+
+void GLArea::cargandoFinal(float * valor){
+    vcg::Point3f luz3d(valor[0],valor[1],valor[2]);
+    vcg::Point3f luzDA(valor[3],valor[4],valor[5]);
+    girarMalla();
+    dibujarEje = true;
+    track.Reset();
+    estadoDelCalculo = 3;
+}
+
+void GLArea::EmitirInformacionEje(){
+    QString texto;
+    texto.append(QString::number(ejeFinal.Origin().X()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Origin().Y()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Origin().Z()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().X()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().Y()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().Z()));
+    texto.append("\n");
+    texto.append(QString::number(anguloRotar));
+    texto.append("\n");
+    texto.append(QString::number(anguloPieza));
+    texto.append("\n");
+    emit InformacionEje(texto);
+}
+
+void GLArea::EmitirInformacionContorno(){
+    QString texto;
+    texto.append(QString::number(puntosObtenidos.size()));
+    texto.append("\n");
+    for(int i=0; i<puntosObtenidos.size(); ++i){
+        texto.append(QString::number(puntosObtenidos.at(i).distancia));
+        texto.append("\n");
+        texto.append(QString::number(puntosObtenidos.at(i).altura));
+        texto.append("\n");
+}
+    emit InformacionContorno(texto);
+}
+
+void GLArea::EmitirInformacionFinal(){
+    QString texto;
+    texto.append(QString::number(ejeFinal.Origin().X()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Origin().Y()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Origin().Z()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().X()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().Y()));
+    texto.append("\n");
+    texto.append(QString::number(ejeFinal.Direction().Z()));
+    texto.append("\n");
+    texto.append(QString::number(anguloRotar));
+    emit InformacionEje(texto);
+}
+
+
+float GLArea::reCalidadDelEje(int genetico){
+    if(genetico == 1){
+        if(!noMejora){
+            float calidad;
+            nuevoCentro[0] = nuevoCentro[0] + (vcg::ClosestPoint(ejeFinal,centro[0])-nuevoCentro[0])/2;
+            nuevoCentro[1] = nuevoCentro[1] + (vcg::ClosestPoint(ejeFinal,centro[1])-nuevoCentro[1])/2;
+            vcg::Point3f origen = nuevoCentro[0];
+            vcg::Point3f destino = nuevoCentro[1]-nuevoCentro[0];
+            destino = destino.Normalize();
+            float producto = -origen.Z()/destino.Z();
+            origen = origen-destino*producto;
+            ejeFinal.Set(origen,destino);
+            calidad = calidadDelEje();
+            if(calidad > calidadAnterior){
+                    ejeFinal.Set(ejeDePrueba.Origin(),ejeDePrueba.Direction());
+                    noMejora = true;
+                    emit setStatusBar(tr("Ya no puede seguir calculando, no mejora."));
+            }else{
+                    calidadAnterior = calidad;
+            }
+            emit Imprimir("\nLa calidad del eje: " + QString::number(calidad));
+        }else
+            emit setStatusBar(tr("¡Que no mejora, he dicho!"));
+    }else{
+        calidadDelEje();
+        dibujarAristas = true;
+    }
+}
+
+void GLArea::ObtenerPlanosCorte(){
+    vcg::Plane3f plano;
+    float altura = -glWrap.m->bbox.MaxDim();
+    do{
+        plano.Set(ejeFinal.Direction(),altura);
+        altura = altura + 0.001;
+        //cout << "\n" << altura << "\n";
+    }while(!InterseccionPlanoPieza(plano,0));
+    altura += 0.001;
+    InterseccionPlanoPieza(plano,0);
+    altura = glWrap.m->bbox.MaxDim();
+    emit AvanzarBarra((int) 20);
+    do{
+        plano.Set(ejeFinal.Direction(),altura);
+        altura = altura - 0.001;
+        //cout << "\n" << altura << "\n";
+    }while(!InterseccionPlanoPieza(plano,1));
+    altura = altura - 0.001;
+    InterseccionPlanoPieza(plano,1);
 }
 
 bool GLArea::InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual){
@@ -1246,320 +1669,8 @@ bool GLArea::InterseccionPlanoPieza(vcg::Plane3f plano, int planoActual){
     return (aristacas[planoActual].edges.size() > 0);
 }
 
-void GLArea::continuarRANSAC(){
-    if(ransacCalculado){
-        hebra->setOperacion(1);
-        hebra->insertarVoxels(voxels);
-        hebra->start();
-    }else
-        emit setStatusBar(tr("No se puede continuar calculando RANSAC si no se ha iniciado a calcular"));
-}
-
-void GLArea::AdaptarEje(){
-    float x,y,z,minimo,aux;
-    int redondeado, menor;
-    minimo = 100000000;
-    menor = -1;
-    if(ejeFinal.Direction().X() != 0)
-        if(ejeFinal.Origin().X() > -glWrap.m->bbox.DimX()/2.){
-            x = (-glWrap.m->bbox.DimX()/2. - ejeFinal.Origin().X())/ejeFinal.Direction().X();
-            if(x<0) minimo = -x;
-            else minimo = x;
-            menor = 0;
-        }
-    if(ejeFinal.Direction().Y() != 0)
-        if(ejeFinal.Origin().Y() > -glWrap.m->bbox.DimY()/2.){
-            y = (-glWrap.m->bbox.DimY()/2. - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
-            if(y<0) aux = -y;
-            else aux = y;
-            if(aux < minimo){
-                minimo = aux;
-                menor = 1;
-            }
-        }
-    if(ejeFinal.Direction().Z() != 0)
-        if(ejeFinal.Origin().Z() > -glWrap.m->bbox.DimZ()/2.){
-            z = (-glWrap.m->bbox.DimZ()/2. - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
-            if(z<0) aux = -z;
-            else aux = z;
-            if(aux < minimo){
-                minimo = aux;
-                menor = 2;
-            }
-        }
-    cout << "\n MENORL ORIGENRL " << menor;
-    if(menor != -1){
-        if(menor == 0)
-            aux = x;
-        else if(menor == 1)
-            aux = y;
-        else if(menor == 2)
-            aux = z;
-
-        if(aux > 0){
-            redondeado = aux;
-            redondeado ++;
-        }else{
-            aux = -aux;
-            redondeado = aux;
-            redondeado ++;
-            redondeado = - redondeado;
-        }
-
-        ejeFinal.SetOrigin(ejeFinal.Origin() + ejeFinal.Direction() * redondeado);
-    }
-    
-
-    minimo = 100000000;
-    menor = -1;
-    if(ejeFinal.Direction().X() != 0)
-        if(ejeFinal.Origin().X()+ejeFinal.Direction().X() < glWrap.m->bbox.DimX()/2.){
-            x = (glWrap.m->bbox.DimX()/2. - ejeFinal.Origin().X())/ejeFinal.Direction().X();
-            if(x<0) minimo = -x;
-            else minimo = x;
-            menor = 0;
-        }
-    if(ejeFinal.Direction().Y() != 0)
-        if(ejeFinal.Origin().Y()+ejeFinal.Direction().Y() < glWrap.m->bbox.DimY()/2.){
-            y = (glWrap.m->bbox.DimY()/2. - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
-            if(y<0) aux = -y;
-            else aux = y;
-            if(aux < minimo){
-                minimo = aux;
-                menor = 1;
-            }
-        }
-    if(ejeFinal.Direction().Z() != 0)
-        if(ejeFinal.Origin().Z()+ejeFinal.Direction().Z() < glWrap.m->bbox.DimZ()/2.){
-            z = (glWrap.m->bbox.DimZ()/2. - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
-            if(z<0) aux = -z;
-            else aux = z;
-            if(aux < minimo){
-                minimo = aux;
-                menor = 2;
-            }
-        }
-    cout << "\n MENORL DESTINORL " << menor;
-    if(menor != -1){
-        if(menor == 0)
-            aux = x;
-        else if(menor == 1)
-            aux = y;
-        else if(menor == 2)
-            aux = z;
-
-        if(aux > 0){
-            redondeado = aux;
-            redondeado ++;
-        }else{
-            aux = -aux;
-            redondeado = aux;
-            redondeado ++;
-            redondeado = - redondeado;
-        }
-
-        ejeFinal.SetDirection(ejeFinal.Direction() * redondeado);
-    }/*
-
-    if(menor != -1){
-        minimo = -1;
-        if(menor == 0){
-                x = (glWrap.m->bbox.DimX()*0.65 - ejeFinal.Origin().X())/ejeFinal.Direction().X();
-                aux = x;
-                minimo = 1;
-        }else if(menor == 1){
-                y = (glWrap.m->bbox.DimY()*0.65 - ejeFinal.Origin().Y())/ejeFinal.Direction().Y();
-                aux = y;
-                minimo = 1;
-        }else if(menor == 2){
-                z = (glWrap.m->bbox.DimZ()*0.65 - ejeFinal.Origin().Z())/ejeFinal.Direction().Z();
-                aux = z;
-                minimo = 1;
-        }
-        if(minimo == 1)
-            ejeFinal.SetDirection(ejeFinal.Direction() * aux);
-    }*/
-}
-
-void GLArea::calculoAcabado(QMultiMap<int,Voxel> voxelsFinal, float valorMedioFinal, vcg::Point3f nodoRaizFinal, int maxInterseccionVoxelFinal, vcg::Line3f ejeFinalFinal){
-    float calidad;
-    voxels = voxelsFinal;
-    dibujarEje = parametrosCargados[8];
-    if(dibujarEje) emit activaBotonEje();
-    if(calcularV) emit activaBotonVoxels();
-    voxelesDibujando = true;
-    valorMedio = valorMedioFinal;
-    nodoRaiz = nodoRaizFinal;
-    maxInterseccionVoxel = maxInterseccionVoxelFinal;
-    ejeFinal = ejeFinalFinal;
-    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()
-                           << " Y " << ejeFinal.Origin().Y()
-                           << " Z " << ejeFinal.Origin().X()<< "\n";
-    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()+ejeFinal.Direction().X()
-                           << " Y " << ejeFinal.Origin().Y()+ejeFinal.Direction().Y()
-                           << " Z " << ejeFinal.Origin().X()+ejeFinal.Direction().Z() << "\n";
-    cout << "\nDimensiones caja: X " << glWrap.m->bbox.DimX()*0.5
-                            << " Y " << glWrap.m->bbox.DimY()*0.5
-                            << " Z " << glWrap.m->bbox.DimZ() << "\n";
-    AdaptarEje();
-    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()
-                           << " Y " << ejeFinal.Origin().Y()
-                           << " Z " << ejeFinal.Origin().X()<< "\n";
-    cout << "\nDimensiones eje: X " << ejeFinal.Origin().X()+ejeFinal.Direction().X()
-                           << " Y " << ejeFinal.Origin().Y()+ejeFinal.Direction().Y()
-                           << " Z " << ejeFinal.Origin().X()+ejeFinal.Direction().Z() << "\n";
-    emit ajustarMaximoVoxeles(maxInterseccionVoxel);
-    valorColorVoxel = maxInterseccionVoxel - cantidadDeIntersecciones;
-    valorColorVoxel = valorColorVoxel / 7;
-    if(valorColorVoxel <= 0) valorColorVoxel = 1;
-
-   /* if(realizarGenetico)
-        calidad = calidadDelEje();
-    else
-        calidad = -1;
-
-    calidadAnterior = calidad;
-    emit Imprimir("\nLa calidad del eje: " + QString::number(calidad) + " y el tamanio del mismo " + QString::number(ejeFinal.Direction().Norm()));
-    if(calidad>=0){
-        dibujarAristas = true;
-    }*/
-    noMejora = false;
-    estadoDelCalculo = 1;
-    emit activaBotonContorno();
-}
-
-void GLArea::GeneticoRefinaEje(){
-    bool reiterar = true;
-    vcg::Line3f ejeCandidato;
-    vcg::Line3f ejeActual;
-    vcg::Point3f origen = nuevoCentro[0];
-    vcg::Point3f destino = nuevoCentro[1]-nuevoCentro[0];
-    vcg::Point3f nuevoCentro0Actual = nuevoCentro[0];
-    vcg::Point3f nuevoCentro1Actual = nuevoCentro[1];
-    float calidadMinima = calidadDelEje(), calidadCandidata, aux;
-    while(reiterar){
-        reiterar = false;
-        ejeActual = ejeFinal;
-        nuevoCentro0Actual = nuevoCentro[0];
-        nuevoCentro1Actual = nuevoCentro[1];
-        origen = nuevoCentro[0];
-        destino = (nuevoCentro[1]-nuevoCentro[0]).Normalize();
-        aux = -origen.Z()/destino.Z();
-        origen = origen-destino*aux;
-        ejeFinal.Set(origen,destino);
-        calidadCandidata = calidadDelEje();
-        if(calidadCandidata < calidadMinima){
-            calidadMinima = calidadCandidata;
-            ejeCandidato.Set(origen,destino);
-            reiterar = true;
-        }
-        origen = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)/2;
-        destino = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)/2;
-        destino = destino - origen;
-        destino = destino.Normalize();
-        aux = -origen.Z()/destino.Z();
-        origen = origen-destino*aux;
-        ejeFinal.Set(origen,destino);
-        calidadCandidata = calidadDelEje();
-        if(calidadCandidata < calidadMinima){
-            calidadMinima = calidadCandidata;
-            ejeCandidato.Set(origen,destino);
-            reiterar = true;
-        }
-        origen = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*2;
-        destino = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*2;
-        destino = destino - origen;
-        destino = destino.Normalize();
-        aux = -origen.Z()/destino.Z();
-        origen = origen-destino*aux;
-        ejeFinal.Set(origen,destino);
-        calidadCandidata = calidadDelEje();
-        if(calidadCandidata < calidadMinima){
-            calidadMinima = calidadCandidata;
-            ejeCandidato.Set(origen,destino);
-            reiterar = true;
-        }
-        origen = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*3/4;
-        destino = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*3/4;
-        destino = destino - origen;
-        destino = destino.Normalize();
-        aux = -origen.Z()/destino.Z();
-        origen = origen-destino*aux;
-        ejeFinal.Set(origen,destino);
-        calidadCandidata = calidadDelEje();
-        if(calidadCandidata < calidadMinima){
-            calidadMinima = calidadCandidata;
-            ejeCandidato.Set(origen,destino);
-            reiterar = true;
-        }
-        origen = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*1/4;
-        destino = nuevoCentro0Actual + (vcg::ClosestPoint(ejeActual,nuevoCentro0Actual)-nuevoCentro0Actual)*1/4;
-        destino = destino - origen;
-        destino = destino.Normalize();
-        aux = -origen.Z()/destino.Z();
-        origen = origen-destino*aux;
-        ejeFinal.Set(origen,destino);
-        calidadCandidata = calidadDelEje();
-        if(calidadCandidata < calidadMinima){
-            calidadMinima = calidadCandidata;
-            ejeCandidato.Set(origen,destino);
-            reiterar = true;
-        }
-        //elegir otros 9 ejes vecinos. ¿Cual es el criterio de ser vecino?
-    }
-    ejeFinal  = ejeCandidato;
-    dibujarAristas = false;
-    emit Imprimir("\nEl resultado al final es: " + QString::number(calidadMinima) + " ¡Bravo!\n");
-}
-
-float GLArea::reCalidadDelEje(int genetico){
-    if(genetico == 0)
-        GeneticoRefinaEje();
-    else if(genetico == 1){
-            if(!noMejora){
-            float calidad;
-            nuevoCentro[0] = nuevoCentro[0] + (vcg::ClosestPoint(ejeFinal,centro[0])-nuevoCentro[0])/2;
-            nuevoCentro[1] = nuevoCentro[1] + (vcg::ClosestPoint(ejeFinal,centro[1])-nuevoCentro[1])/2;
-            vcg::Point3f origen = nuevoCentro[0];
-            vcg::Point3f destino = nuevoCentro[1]-nuevoCentro[0];
-            destino = destino.Normalize();
-            float producto = -origen.Z()/destino.Z();
-            origen = origen-destino*producto;
-            ejeFinal.Set(origen,destino);
-            calidad = calidadDelEje();
-            if(calidad > calidadAnterior){
-                ejeFinal.Set(ejeDePrueba.Origin(),ejeDePrueba.Direction());
-                noMejora = true;
-                emit setStatusBar(tr("Ya no puede seguir calculando, no mejora."));
-            }else{
-                calidadAnterior = calidad;
-            }
-            emit Imprimir("\nLa calidad del eje: " + QString::number(calidad));
-        }else
-            emit setStatusBar(tr("¡Que no mejora, he dicho!"));
-    }else{
-        calidadDelEje();
-        dibujarAristas = true;
-    }
-}
-
-void GLArea::ObtenerPlanosCorte(){
-    vcg::Plane3f plano;
-    float altura = -glWrap.m->bbox.MaxDim();
-    do{
-        plano.Set(ejeFinal.Direction(),altura);
-        altura = altura + 0.0001;
-        //cout << "\n" << altura << "\n";
-    }while(!InterseccionPlanoPieza(plano,0));
-    altura = glWrap.m->bbox.MaxDim();
-    do{
-        plano.Set(ejeFinal.Direction(),altura);
-        altura = altura - 0.0001;
-        //cout << "\n" << altura << "\n";
-    }while(!InterseccionPlanoPieza(plano,1));
-}
-
 float GLArea::calidadDelEje(){
+    emit IniciarBarra();
     QMultiMap<float,vcg::Point3f> puntosOrdenadosDistancia;
     QMultiMap<float,vcg::Point3f>::iterator it;
     ejeDePrueba.Set(ejeFinal.Origin(),ejeFinal.Direction());
@@ -1582,6 +1693,9 @@ float GLArea::calidadDelEje(){
 
     ObtenerPlanosCorte();
 
+
+    emit AvanzarBarra((int)(40));
+
     vcg::Point3f ejeX (1,0,0), aux;
     ejeRotacion = ejeFinal.Direction()^ejeX;
     vcg::Line3f lineaX;
@@ -1592,10 +1706,12 @@ float GLArea::calidadDelEje(){
     quaternion.FromAxis(theta,ejeRotacion);
     quaternionInverso.FromAxis(-theta,ejeRotacion);
 
+    puntoOrigen = quaternion.Rotate(ejeFinal.Origin());
     aux = quaternion.Rotate(ejeFinal.Direction());
     //dibujarEjeDePrueba = true;
     int contar = 0;
     for(int i=0; i<numPlanos; ++i){
+        emit AvanzarBarra((int)(40+30.*i));
         ei = aristacas[i].edges.begin();
         puntosOrdenadosDistancia.clear();
         while(ei!=aristacas[i].edges.end()){
@@ -1603,14 +1719,13 @@ float GLArea::calidadDelEje(){
             ei++;
             puntosOrdenadosDistancia.insert((puntoNuevo - vcg::ClosestPoint(ejeFinal,puntoNuevo)).Norm(),puntoNuevo);
         }
-        contar = puntosOrdenadosDistancia.size()/2. -1;
+        contar = (int) puntosOrdenadosDistancia.size()/2. -1;
         it = puntosOrdenadosDistancia.begin();
         while(contar > 0){
             it = puntosOrdenadosDistancia.erase(it);
             contar--;
         }
         puntosDibujar[i] = puntosOrdenadosDistancia.values();
-        emit Imprimir("\nComo va esto? " + QString::number(puntosOrdenadosDistancia.size()));
         puntosDibujarG.clear();
         foreach(vcg::Point3f punto, puntosDibujar[i]){
             puntoNuevo = quaternion.Rotate(punto);
@@ -1627,7 +1742,8 @@ float GLArea::calidadDelEje(){
         errorAcumulado = errorAcumulado + 1.*(nuevoCentro[i]-centro[i]).Norm();
         nuevoCentro[i] = centro[i];
     }
-
+    emit AcabarBarra();
+    emit setStatusBar(tr("Calidad calculada."));
     return 1.*errorAcumulado;
 }
 
@@ -1674,74 +1790,101 @@ float * GLArea::ajusteCirculo(QList<vcg::Point3f> conjuntoPuntos){
         return r;
 }
 
-
-
-int GLArea::GrahamScan(QList<PuntoContornoLight> &puntos){
-    PuntoContornoLight p0;
-    //puntoGraham * primerPunto;
-    QMap<PuntoContornoLight,PuntoContornoLight> puntosOrdenados;
-    QMap<float,PuntoContornoLight> puntosAlturasOrdenados;
-    int i, m, n, posMin = 0;
-    float cat, alt, angulo;
-    //Seleccionar el punto con menor altura y mas cerca del eje
-    for(i=0; i<puntos.size(); ++i){
-        emit Imprimir("\nPunto: "+QString::number(puntos.at(i).altura) +" "+QString::number(puntos.at(i).distancia));
-        if(puntos.at(i).altura < puntos.at(posMin).altura ||
-           (puntos.at(i).altura == puntos.at(posMin).altura &&
-            puntos.at(i).distancia < puntos.at(posMin).distancia))
-                posMin = i;
-    }
-    //se hace que ese punto este en el primer lugar
-    p0.altura = puntos.at(0).altura;
-    p0.distancia = puntos.at(0).distancia;
-    puntos.replace(0,puntos.at(posMin));
-    puntos.replace(posMin,p0);
-    //Se ordenan el resto de puntos segun el angulo
-
-    for(i=1; i<puntos.size(); ++i){
-        cat = puntos[i].distancia - p0.distancia;
-        alt = puntos[i].altura - p0.altura;
-        puntos[i].angulo = atan2(alt,cat);
-        puntos[i].dist2 = sqrt(cat*cat + alt*alt);
-        puntosOrdenados.insert(puntos[i],puntos[i]);
-    }
-    puntos.clear();
-    puntos.append(puntosOrdenados.values().at(puntosOrdenados.size()-1));
-    puntos.append(puntosOrdenados.values());
-
-    m = 2;
-    n = puntosOrdenados.size();
-    for(int i=3; i<=n; ++i){
-        while(m > 1 && ccw(puntos.at(m-1),puntos.at(m),puntos.at(i))<=0)
-            m--;
-
-        m++;
-        p0 = puntos.at(m);
-        puntos[m] = puntos.at(i);
-        puntos[i] = p0;
-    }
-/*
-    for(int i=n; i>=m; --i){
-        puntosAlturasOrdenados.insert(-puntos.at(i).altura,puntos.at(i));
-        //emit Imprimir("\nInsertando: " + QString::number(puntos.at(i).altura) + " " + QString::number(puntos.at(i).distancia));
-        puntos.removeAt(i);
-    }
-    int mtemp = m;
-    emit Imprimir("\nTamanio de esta cosa" + QString::number(m) + " " + QString::number(n) + " - " + QString::number(puntosAlturasOrdenados.size()) + "\n");
-
-    foreach(PuntoContornoLight puntito, puntosAlturasOrdenados){
-        angulo = acos(ccw(puntos.at(m),puntito,puntos.at(0))) * 180./PI;
-        emit Imprimir("Angulo: " + QString::number(angulo) + " Altura: " + QString::number(puntito.altura));
-        //if(angulo >= 90){
-            puntos.append(puntito);
-            emit Imprimir (tr("¡¡PADENTRO!!"));
-            m++;
-        //}
-            emit Imprimir (tr("\n"));
-    }*/
-    return m;
+void GLArea::MoverPieza(bool valor){
+    moverPieza = valor;
 }
 
+void GLArea::FiltrarPuntos(QList<PuntoContornoLight> &puntos){
+    /*int numSaltos = 10,mediana, mitad, mitadOffset;
+    float alturaMin = 1000000, alturaMax=-1000000, saltoAltura, altura;
+    PuntoContornoLight punto1, punto2;
+    QMap<float,PuntoContornoLight> puntosDistancias;
+    QList<PuntoContornoLight>::iterator puntosIt;
+    QList<PuntoContornoLight> puntosFuera, puntosDentro;
 
 
+    foreach(PuntoContornoLight punto, puntos){
+        altura = punto.altura;
+        if(altura < alturaMin)
+            alturaMin = altura;
+        else if(altura > alturaMax)
+            alturaMax = altura;
+    }
+    saltoAltura = (alturaMax - alturaMin)/numSaltos;
 
+    puntosIt = puntos.begin();
+    for(altura = alturaMin+saltoAltura; altura < alturaMax; altura+=saltoAltura){
+        puntosDistancias.clear();
+        cout << "\n Altura=> " << altura;
+        while(puntosIt->altura < altura){
+            puntosDistancias.insertMulti(puntosIt->distancia,(*puntosIt));
+            puntosIt++;
+        }
+        cout << "\n" << puntosDistancias.size();
+        if(puntosDistancias.size() == 1){
+            puntosFuera.append(puntosDistancias.values().at(0));
+        }else if(puntosDistancias.size() > 1){
+            mitadOffset = mitad = puntosDistancias.size()/2;
+            if(mitad%2!=0){
+                puntosDentro.prepend(puntosDistancias.values().at((mitad+1)/2));
+            }else{
+                punto1 = puntosDistancias.values().at(mitad/2);
+                punto2 = puntosDistancias.values().at(1 + mitad/2);
+                punto1.distancia = punto1.distancia+punto2.distancia /2.;
+                punto1.altura = punto1.altura+punto2.altura /2.;
+                puntosDentro.prepend(punto1);
+            }
+            mitad = puntosDistancias.size() - mitadOffset;
+            if(mitad%2!=0){
+                puntosFuera.append(puntosDistancias.values().at(mitadOffset + (mitad+1)/2));
+            }else{
+                punto1 = puntosDistancias.values().at(mitadOffset + mitad/2);
+                punto2 = puntosDistancias.values().at(mitadOffset + 1 + mitad/2);
+                punto1.distancia = punto1.distancia+punto2.distancia /2.;
+                punto1.altura = punto1.altura+punto2.altura /2.;
+                puntosFuera.append(punto1);
+            }
+        }*/
+   // }
+        /*
+    puntos.clear();
+    puntos.append(puntosFuera);
+    puntos.append(puntosDentro);*/
+}
+
+void GLArea::ComprobarContornos(){
+    if(numContornos == MAXCONTORNOS-1){
+        QList<puntoContorno> * aux;
+        MAXCONTORNOS+=100;
+        aux = new QList<puntoContorno> [MAXCONTORNOS];
+        for(int i=0; i<numContornos; ++i){
+            aux[i].append(contornos[i]);
+            contornos[i].clear();
+        }
+        delete [] contornos;
+        contornos = aux;
+    }
+    if(numContornosInt == MAXCONTORNOSINT-1){
+        QList<puntoContorno> * aux;
+        MAXCONTORNOSINT+=100;
+        aux = new QList<puntoContorno> [MAXCONTORNOSINT];
+        for(int i=0; i<numContornosInt; ++i){
+            aux[i].append(contornosInt[i]);
+            contornosInt[i].clear();
+        }
+        delete [] contornosInt;
+        contornosInt = aux;
+    }
+}
+
+void GLArea::ExportarImagen(QIODevice * salida, const char * formato){
+    // Make GL Context current
+    makeCurrent();
+         // Copy from OpenGL
+    QImage *tempImage = new QImage( grabFrameBuffer() );
+    if ( ! tempImage );
+    if ( !tempImage->save( salida, formato) );
+         // Cleaning memory
+    delete tempImage;
+    salida->close();
+}

@@ -6,20 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
-    <height>710</height>
+    <width>835</width>
+    <height>778</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>480</height>
+    <width>835</width>
+    <height>778</height>
    </size>
   </property>
   <property name="palette">
    <palette>
     <active>
      <colorrole role="WindowText">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>255</red>
+        <green>255</green>
+        <blue>255</blue>
+       </color>
+      </brush>
+     </colorrole>
+     <colorrole role="ButtonText">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
         <red>255</red>
@@ -57,6 +66,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="ButtonText">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>199</red>
+        <green>199</green>
+        <blue>199</blue>
+       </color>
+      </brush>
+     </colorrole>
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
@@ -86,6 +104,15 @@
        </color>
       </brush>
      </colorrole>
+     <colorrole role="ButtonText">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>201</red>
+        <green>199</green>
+        <blue>202</blue>
+       </color>
+      </brush>
+     </colorrole>
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
@@ -111,7 +138,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Sidrac 1.9.1</string>
+   <string>SIDRAC2 - Sin proyecto cargado</string>
   </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
@@ -127,6 +154,16 @@
     <property name="margin">
      <number>9</number>
     </property>
+    <item>
+     <widget class="QLabel" name="tituloProyecto">
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QFrame" name="glFrame">
       <property name="mouseTracking">
@@ -169,7 +206,18 @@
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>P R O G R A M A</string>
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;P&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;G&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;M&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -206,7 +254,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;R&lt;br /&gt;E&lt;br /&gt;C&lt;br /&gt;O&lt;br /&gt;N&lt;br /&gt;S&lt;br /&gt;T&lt;br /&gt;R&lt;br /&gt;U&lt;br /&gt;C&lt;br /&gt;C&lt;br /&gt;I&lt;br /&gt;O&lt;br /&gt;N&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;br /&gt;E&lt;br /&gt;C&lt;br /&gt;O&lt;br /&gt;N&lt;br /&gt;S&lt;br /&gt;T&lt;br /&gt;R&lt;br /&gt;U&lt;br /&gt;C&lt;br /&gt;C&lt;br /&gt;I&lt;br /&gt;O&lt;br /&gt;N&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -301,7 +349,11 @@ p, li { white-space: pre-wrap; }
        <bool>true</bool>
       </property>
       <property name="text">
-       <string>V I S U A L I Z A C I O N</string>
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;V I S U A L I Z A C I O N&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -309,42 +361,6 @@ p, li { white-space: pre-wrap; }
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>804</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuHerramientas">
-    <property name="title">
-     <string>&amp;Herramientas</string>
-    </property>
-    <widget class="QMenu" name="menuModo_de_visualizaci_n">
-     <property name="title">
-      <string>Modo de &amp;visualización</string>
-     </property>
-     <addaction name="actionPuntos"/>
-     <addaction name="actionAristas"/>
-     <addaction name="actionAristas_y_caras_planas"/>
-     <addaction name="actionCaras_planas"/>
-     <addaction name="actionCaras_suavizadas"/>
-     <addaction name="actionAristas_ocultas"/>
-    </widget>
-    <addaction name="menuModo_de_visualizaci_n"/>
-   </widget>
-   <widget class="QMenu" name="menuAyuda">
-    <property name="title">
-     <string>A&amp;yuda</string>
-    </property>
-    <addaction name="actionAcerca_de"/>
-    <addaction name="actionAcerca_de_Qt"/>
-   </widget>
-   <addaction name="menuHerramientas"/>
-   <addaction name="menuAyuda"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="mouseTracking">
@@ -355,13 +371,13 @@ p, li { white-space: pre-wrap; }
    <property name="minimumSize">
     <size>
      <width>120</width>
-     <height>380</height>
+     <height>650</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>120</width>
-     <height>380</height>
+     <height>650</height>
     </size>
    </property>
    <property name="palette">
@@ -432,124 +448,588 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetVerticalTitleBar</set>
+    <set>QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::TopDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Herramientas de programa</string>
+    <string/>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <widget class="QToolButton" name="BotonImportar">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>81</width>
-       <height>81</height>
+       <x>20</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>IMPORTAR</string>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/folder_previous.ico</normaloff>:/new/IconosPrograma/Iconos/folder_previous.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
     </widget>
     <widget class="QToolButton" name="BotonExportar">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>81</width>
-       <height>81</height>
+       <x>20</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>EXPORTAR</string>
+      <string>Modelo</string>
      </property>
-    </widget>
-    <widget class="QToolButton" name="BotonAyuda">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>200</y>
-       <width>81</width>
-       <height>81</height>
-      </rect>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/exportar3d.png</normaloff>:/new/IconosPrograma/Iconos/exportar3d.png</iconset>
      </property>
-     <property name="text">
-      <string>AYUDA</string>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonSalir">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>290</y>
-       <width>81</width>
-       <height>81</height>
+       <x>20</x>
+       <y>460</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>SALIR</string>
+      <string>Salir</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/1284501154_exit-off-power-shutdown.png</normaloff>:/new/IconosPrograma/Iconos/1284501154_exit-off-power-shutdown.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QPushButton" name="FijarPrograma">
      <property name="geometry">
       <rect>
-       <x>72</x>
-       <y>2</y>
-       <width>15</width>
-       <height>15</height>
+       <x>90</x>
+       <y>40</y>
+       <width>30</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>15</width>
-       <height>15</height>
+       <width>30</width>
+       <height>30</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>15</width>
-       <height>15</height>
+       <width>30</width>
+       <height>30</height>
       </size>
      </property>
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/pin.png</normaloff>:/new/IconosGlobales/Iconos/pin.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonAtras_Programa">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>560</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ATRÁS</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/back.ico</normaloff>:/new/IconosGlobales/Iconos/back.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMProyecto">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PROYECTO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/page.ico</normaloff>:/new/IconosPrograma/Iconos/page.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonNuevoProyecto">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CREAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/page_edit.ico</normaloff>:/new/IconosPrograma/Iconos/page_edit.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonCargarProyecto">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CARGAR...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/page_previous.ico</normaloff>:/new/IconosPrograma/Iconos/page_previous.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonGuardarProyecto">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>300</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>GUARDAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/page_next.ico</normaloff>:/new/IconosPrograma/Iconos/page_next.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonCerrarProyecto">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>460</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CERRAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/Cerrar.png</normaloff>:/new/IconosPrograma/Iconos/Cerrar.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMExportar">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>EXPORTAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/folder_next.ico</normaloff>:/new/IconosPrograma/Iconos/folder_next.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonExportarDibujo">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DIBUJO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/image_next.ico</normaloff>:/new/IconosPrograma/Iconos/image_next.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMExportarPulsado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>EXPORTAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/folder_remove.ico</normaloff>:/new/IconosPrograma/Iconos/folder_remove.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMProyectoPulsado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PROYECTO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/page_remove.ico</normaloff>:/new/IconosPrograma/Iconos/page_remove.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaPrincipal_2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>90</y>
+       <width>15</width>
+       <height>401</height>
+      </rect>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;P&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;G&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;M&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonGuardarProyectoComo">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>380</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>GUARDAR...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosPrograma/Iconos/Untitled-1.png</normaloff>:/new/IconosPrograma/Iconos/Untitled-1.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaPrograma">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>128</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaPrograma_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>540</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="FijarPrograma_2">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="MenuVisualizacion">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="minimumSize">
     <size>
-     <width>780</width>
+     <width>2000</width>
      <height>120</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>780</width>
+     <width>2000</width>
      <height>120</height>
     </size>
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
    <property name="features">
-    <set>QDockWidget::NoDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
    </property>
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::BottomDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Herramientas de visualización</string>
+    <string/>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -557,60 +1037,66 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="dockWidgetContents_3">
     <widget class="QToolButton" name="BotonDibujarEje">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
+       <x>560</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>EJE</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/MostrarEje.png</normaloff>:/new/IconosVisualizacion/Iconos/MostrarEje.png</iconset>
      </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QToolButton" name="BotonMostrarPlano">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>420</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>PLANO</string>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonPantallaCompleta">
      <property name="geometry">
       <rect>
-       <x>690</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
+       <x>120</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>PANTALLA 
-COMPLETA</string>
+      <string>FULLSCREEN</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/window.ico</normaloff>:/new/IconosVisualizacion/Iconos/window.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonDibujar">
@@ -619,10 +1105,10 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>510</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
+       <x>120</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
@@ -637,21 +1123,34 @@ COMPLETA</string>
     </widget>
     <widget class="QToolButton" name="BotonNormales">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>600</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
+       <x>460</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>NORMALES</string>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/MostrarNormales.png</normaloff>:/new/IconosVisualizacion/Iconos/MostrarNormales.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonDibujarVoxels">
@@ -660,14 +1159,24 @@ COMPLETA</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>110</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
+       <x>120</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>VOXELES</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/MostrarVoxels.png</normaloff>:/new/IconosVisualizacion/Iconos/MostrarVoxels.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -675,15 +1184,18 @@ COMPLETA</string>
      <property name="checked">
       <bool>false</bool>
      </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
     </widget>
     <widget class="QSlider" name="sliderVoxeles">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>60</y>
+       <x>230</x>
+       <y>80</y>
        <width>191</width>
        <height>21</height>
       </rect>
@@ -700,12 +1212,12 @@ COMPLETA</string>
     </widget>
     <widget class="QLabel" name="tituloSliderVoxeles">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>21</y>
+       <x>240</x>
+       <y>40</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -718,10 +1230,10 @@ nº de intersecciones:</string>
     <widget class="QLabel" name="etiquetaNumVoxeles">
      <property name="geometry">
       <rect>
-       <x>340</x>
-       <y>30</y>
-       <width>46</width>
-       <height>20</height>
+       <x>386</x>
+       <y>19</y>
+       <width>20</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
@@ -731,16 +1243,16 @@ nº de intersecciones:</string>
     <widget class="QPushButton" name="FijarVisualizacion">
      <property name="geometry">
       <rect>
-       <x>2</x>
-       <y>2</y>
-       <width>15</width>
-       <height>15</height>
+       <x>770</x>
+       <y>0</y>
+       <width>30</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>15</width>
-       <height>15</height>
+       <width>30</width>
+       <height>30</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -752,8 +1264,599 @@ nº de intersecciones:</string>
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/pin.png</normaloff>:/new/IconosGlobales/Iconos/pin.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaContorno">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>31</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;C&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;N&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;T&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;N&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonAtras_Visualizacion">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>710</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ATRÁS</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/back.ico</normaloff>:/new/IconosGlobales/Iconos/back.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMReconstruccion">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>AVANZADO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/process.ico</normaloff>:/new/IconosVisualizacion/Iconos/process.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMReconstruccionPulsado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>AVANZADO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/process_remove.ico</normaloff>:/new/IconosVisualizacion/Iconos/process_remove.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMModoPulsado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MODO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/movie_track_remove.ico</normaloff>:/new/IconosVisualizacion/Iconos/movie_track_remove.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMAplicacionPulsado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>APLICACION</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/CerrarAplicacion.png</normaloff>:/new/IconosVisualizacion/Iconos/CerrarAplicacion.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaEje">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>31</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;E&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;J&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;E&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonColor">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>COLOR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/Colores.png</normaloff>:/new/IconosVisualizacion/Iconos/Colores.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonPerfil">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PERFIL</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonElementos">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ELEMENTOS</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Elementos.png</normaloff>:/new/IconosReconstruccion/Iconos/Elementos.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMenusDinamicos">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MENUSES</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/application_lock.ico</normaloff>
+       <selectedon>:/new/IconosVisualizacion/Iconos/application_up.ico</selectedon>:/new/IconosVisualizacion/Iconos/application_lock.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMModo">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MODO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/movie_track.ico</normaloff>:/new/IconosVisualizacion/Iconos/movie_track.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMAplicacion">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>30</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>APLICACION</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosVisualizacion/Iconos/applications.ico</normaloff>:/new/IconosVisualizacion/Iconos/applications.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaVisualizacion_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>751</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>112</red>
+           <green>111</green>
+           <blue>113</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>112</red>
+           <green>111</green>
+           <blue>113</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;V I S U A L I Z A C I O N&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="elementos1">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>8</y>
+       <width>84</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Puntos</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="elementos2">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>30</y>
+       <width>84</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Aristas</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="elementos3">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>50</y>
+       <width>131</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Caras y aristas</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="elementos4">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>84</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Caras planas</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="elementos5">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>90</y>
+       <width>121</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Caras suavizadas</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaVisualizacion">
+     <property name="geometry">
+      <rect>
+       <x>86</x>
+       <y>20</y>
+       <width>20</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaVisualizacion_2">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>20</y>
+       <width>20</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="FijarVisualizacion_2">
+     <property name="geometry">
+      <rect>
+       <x>770</x>
+       <y>0</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -761,27 +1864,27 @@ nº de intersecciones:</string>
   <widget class="QDockWidget" name="MenuInteractuar">
    <property name="minimumSize">
     <size>
-     <width>120</width>
-     <height>600</height>
+     <width>130</width>
+     <height>650</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>120</width>
-     <height>600</height>
+     <width>130</width>
+     <height>650</height>
     </size>
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetVerticalTitleBar</set>
+    <set>QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Herrramientas de reconstrucción</string>
+    <string/>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -789,88 +1892,124 @@ nº de intersecciones:</string>
    <widget class="QWidget" name="dockWidgetContents_2">
     <widget class="QToolButton" name="BotonContorno">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>290</y>
-       <width>81</width>
-       <height>81</height>
+       <x>50</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>CONTORNO</string>
+      <string>INTERIOR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/ContInt.png</normaloff>:/new/IconosReconstruccion/Iconos/ContInt.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
      </property>
      <property name="checkable">
       <bool>true</bool>
      </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
     </widget>
     <widget class="QToolButton" name="BotonReset">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>50</x>
        <y>380</y>
-       <width>81</width>
-       <height>81</height>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>RESET</string>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/ConReset.png</normaloff>:/new/IconosReconstruccion/Iconos/ConReset.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
      <property name="checkable">
       <bool>false</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonGenerar">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>470</y>
-       <width>81</width>
-       <height>81</height>
+       <x>50</x>
+       <y>460</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
       <string>GENERAR</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/GenerarContorno.png</normaloff>:/new/IconosReconstruccion/Iconos/GenerarContorno.png</iconset>
      </property>
-    </widget>
-    <widget class="QCheckBox" name="generarInferior">
-     <property name="enabled">
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
       <bool>false</bool>
      </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>560</y>
-       <width>72</width>
-       <height>18</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Inferior</string>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonEje">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>81</width>
-       <height>81</height>
+       <x>50</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>EJE</string>
+      <string>PARAMETROS</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Parametros.png</normaloff>:/new/IconosReconstruccion/Iconos/Parametros.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonTemporal">
@@ -879,71 +2018,97 @@ nº de intersecciones:</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>81</width>
-       <height>81</height>
+       <x>50</x>
+       <y>300</y>
+       <width>31</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>CONTINUAR</string>
+      <string>CONT</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonEje2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>200</y>
-       <width>81</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>RECALIDAD</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="step">
      <property name="enabled">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>580</y>
-       <width>72</width>
-       <height>18</height>
+       <x>90</x>
+       <y>300</y>
+       <width>31</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>step</string>
+      <string>INUAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QToolButton" name="BotonInvertir">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>240</y>
-       <width>81</width>
-       <height>41</height>
+       <x>50</x>
+       <y>380</y>
+       <width>71</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="text">
-      <string>INVERTIR EJE</string>
+      <string>INVERTIR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Invertir.png</normaloff>:/new/IconosReconstruccion/Iconos/Invertir.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
      </property>
     </widget>
     <widget class="QPushButton" name="FijarConstruccion">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>2</y>
-       <width>15</width>
-       <height>15</height>
+       <y>42</y>
+       <width>30</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>15</width>
-       <height>15</height>
+       <width>30</width>
+       <height>30</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -955,8 +2120,659 @@ nº de intersecciones:</string>
      <property name="text">
       <string/>
      </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/pin.png</normaloff>:/new/IconosGlobales/Iconos/pin.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaProcesado">
+     <property name="geometry">
+      <rect>
+       <x>31</x>
+       <y>90</y>
+       <width>20</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;P&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;C&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;S&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;D&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaPostProcesado">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>370</y>
+       <width>31</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;P&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;S&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;P&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;R&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;C&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;S&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;A&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;D&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:6pt; font-style:italic;&quot;&gt;O&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonCalcularEje">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>460</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CALCULAR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Calculando Eje.png</normaloff>:/new/IconosReconstruccion/Iconos/Calculando Eje.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMetodo">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CLUSTER</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Cluster.png</normaloff>:/new/IconosReconstruccion/Iconos/Cluster.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMEjePulsado">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>EJE</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/EjeCerrar.png</normaloff>:/new/IconosReconstruccion/Iconos/EjeCerrar.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMDibArqPulsado">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DIB. ARQ.</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/image_remove.ico</normaloff>:/new/IconosReconstruccion/Iconos/image_remove.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonM3DPulsado">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MODELO 3D</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/3dPulsado.png</normaloff>:/new/IconosReconstruccion/Iconos/3dPulsado.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMContornoPulsado">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CP</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Contorno2.png</normaloff>:/new/IconosReconstruccion/Iconos/Contorno2.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMEje">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>60</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>EJE</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Eje.png</normaloff>:/new/IconosReconstruccion/Iconos/Eje.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonContornoExterior">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>EXTERIOR</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/ContExt.png</normaloff>:/new/IconosReconstruccion/Iconos/ContExt.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonDeshacer">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>300</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DESHACER</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Deshacer.png</normaloff>:/new/IconosReconstruccion/Iconos/Deshacer.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonLuz">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LUZ</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Luz.png</normaloff>:/new/IconosReconstruccion/Iconos/Luz.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMesa">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>M3</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMoverPieza">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>220</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PIEZA</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/MoverPieza.png</normaloff>:/new/IconosReconstruccion/Iconos/MoverPieza.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonLuzDibujo">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LUZ</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Luz.png</normaloff>:/new/IconosReconstruccion/Iconos/Luz.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMedidas">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>300</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Medidas
+Dibujo</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMContorno">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>140</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CONTORNO</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/Contorno.png</normaloff>:/new/IconosReconstruccion/Iconos/Contorno.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonM3D">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>380</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MODELO 3D</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/3d.png</normaloff>:/new/IconosReconstruccion/Iconos/3d.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonMDibArq">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>460</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DIB. ARQ.</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosReconstruccion/Iconos/image.ico</normaloff>:/new/IconosReconstruccion/Iconos/image.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="BotonAtras_Reconstruccion">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>560</y>
+       <width>71</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ATRÁS</string>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/back.ico</normaloff>:/new/IconosGlobales/Iconos/back.ico</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>45</width>
+       <height>45</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="etiquetaInteractuar_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>8</width>
+       <height>506</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;R&lt;br /&gt;E&lt;br /&gt;C&lt;br /&gt;O&lt;br /&gt;N&lt;br /&gt;S&lt;br /&gt;T&lt;br /&gt;R&lt;br /&gt;U&lt;br /&gt;C&lt;br /&gt;C&lt;br /&gt;I&lt;br /&gt;O&lt;br /&gt;N&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaReconstruccion">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>126</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="lineaReconstruccion_2">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>540</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="FijarConstruccion_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="Iconos.qrc">
+       <normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</normaloff>:/new/IconosGlobales/Iconos/PinPulsado.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -1102,6 +2918,8 @@ nº de intersecciones:</string>
    <header>glarea.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="Iconos.qrc"/>
+ </resources>
  <connections/>
 </ui>

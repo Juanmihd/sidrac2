@@ -111,8 +111,3 @@ bool puntoContorno::operator==(puntoContorno p1) const{
     }
     return false;
 }
-
-
-float ccw(PuntoContornoLight p1, PuntoContornoLight p2, PuntoContornoLight p3){
-    return (p2.distancia - p1.distancia)*(p3.altura - p1.altura) - (p2.altura - p1.altura)*(p3.distancia - p1.distancia);
-}
