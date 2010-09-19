@@ -74,6 +74,18 @@ GLArea::GLArea (QWidget * parent)
 }
 
 void GLArea::ResetearPieza(){
+    delete hebra;
+    hebra = new hebraCalculoEje(this);
+    connect(hebra, SIGNAL(finalizaHebra(QMultiMap<int,Voxel>,
+                                        float,
+                                        vcg::Point3f,
+                                        int,
+                                        vcg::Line3f)),
+            this, SLOT(calculoAcabado(QMultiMap<int,Voxel>,
+                                      float,
+                                      vcg::Point3f,
+                                      int,
+                                      vcg::Line3f)), Qt::DirectConnection);
     normales.clear();
     puntosObtenidos.clear();
     puntosExtras.clear();
@@ -435,11 +447,12 @@ void GLArea::paintGL ()
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();//Dibujar el contorno cutre
         gluLookAt(0,0,5,   0,0,0,   0,1,0);
-        glColor3f(0.2,0.2,0.2);
-        if(GLArea::width() > GLArea::height())
-            renderText(-(1/zoom)*aspectRatio+0.1/zoom,(1/zoom)-0.1/zoom,0,"¡¡¡Nombre de la pieza!!!",this->font());
-        else
-            renderText(-(1/zoom)+0.1/zoom,(1/zoom)/aspectRatio-0.1/zoom,0,"¡¡¡Nombre de la pieza!!!",this->font());
+        glColor3f(0.2,0.2,0.2);/*
+        if(GLArea::width() > GLArea::height()){
+            renderText(-(1/zoom)*aspectRatio+0.1/zoom,(1/zoom)-0.1/zoom,0,"ESCALA DE LA PIEZA",this->font());
+        }else{
+            renderText(-(1/zoom)+0.1/zoom,(1/zoom)/aspectRatio-0.1/zoom,0,"ESCALA DE LA PIEZA",this->font());
+        }*/
 
         track.Reset();
         track.center=vcg::Point3f(0, 0, 0);
@@ -464,8 +477,9 @@ void GLArea::paintGL ()
             renderText(-distanciaMaxGlobal,maxGlobal+0.01,0,QString::number(distanciaMaxGlobal/escala),this->font());//QFont("helvetica", 12, QFont::Bold, TRUE));
             glPushMatrix();
                 glRotatef(90,0,0,1);
-                renderText(0,0,0,QString::number((maxGlobal + minGlobal)/escala),this->font());
+                renderText(0,0,0,QString::number((maxGlobal - minGlobal)/escala),this->font());
             glPopMatrix();
+            renderText(0,minGlobal*1.1,0,"ESCALA",this->font());
             glDisable(GL_LINE_SMOOTH);
             glColor3f(0,0,0);
             glEnd();
@@ -528,10 +542,10 @@ void GLArea::paintGL ()
                 glWrapPlano.Draw<vcg::GLW::DMFlat, vcg::GLW::CMPerFace, vcg::GLW::TMNone> ();
             if(dibujarEje){
                 glPushMatrix();
-                glColor3f(0,1,0);
+                glColor3f(1,0,0);
                 glDisable(GL_LIGHTING);
                 glEnable(GL_LINE_SMOOTH);
-                glLineWidth(1.7);
+                glLineWidth(2);
                 if(contornoExterior)
                 for(int i=0; i<numContornos; ++i){
                     glBegin(GL_LINE_STRIP);
@@ -672,7 +686,7 @@ void GLArea::paintGL ()
             }
             glPushMatrix();
             glPopMatrix();
-            if(false /*dibujarAristas*/){
+            if(false){//dibujarAristas){
                 glColor3f(1,0,0);
                 glEnable(GL_POINT_SMOOTH);
                 glDisable(GL_LIGHTING);
@@ -907,26 +921,29 @@ void GLArea::calcularEje(){
     emit CrearConfiguracionEje(parametros);
 }
 
-void GLArea::calcularInicializarEje(){
+void GLArea::calcularInicializarEje(bool metodo){
     int * parametros = new int [7];
-    if(numCaras < 10000)
-        parametros[0] = 10;
-    else if(numCaras < 100000)
-        parametros[0] = 50;
-    else if(numCaras < 1000000)
-        parametros[0] = 1000;
-    else
-        parametros[0] = 1500;
     parametros[1] = 60;
     parametros[2] = 90;
     parametros[3] = 50;
     parametros[4] = 1000;
     parametros[5] = 10;
     parametros[6] = 0;
-    inicializarEje(parametros[0],parametros[1],parametros[2],parametros[3],parametros[4],parametros[5],parametros[6],true,true,parametros[9]);
+    if(numCaras < 10000)
+        parametros[0] = 10;
+    else if(numCaras < 100000)
+        parametros[0] = 50;
+    else if(numCaras < 1000000){
+        parametros[0] = 2000;
+        parametros[1] = 70;
+        parametros[3] = 40;
+    }else
+        parametros[0] = 2500;
+    inicializarEje(parametros[0],parametros[1],parametros[2],parametros[3],parametros[4],parametros[5],parametros[6],true,true,parametros[9],metodo);
 }
 
-void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje){
+void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje, bool metodo){
+    metodoCluster = metodo;
     porcentajeDeseado = porcentaje/100.;
     limiteVoxelesInferior = limInf;
     limiteVoxelesIntermedio = limIntermedio/100.;
@@ -1005,7 +1022,7 @@ void GLArea::inicializarEje(int limInf, int limIntermedio, int porcentaje, int l
             ;//emit AvisoError();
         else{
             hebra->setParametros(parametrosCargados);
-            hebra->setOperacion(0);
+            hebra->setOperacion(0,metodoCluster);
             hebra->insertarDatos(glWrap);
             if(!calcularVoxels)
                 hebra->insertarVoxels(voxels);
@@ -1447,7 +1464,7 @@ void GLArea::alternarDibujoVoxels(){
 
 void GLArea::continuarRANSAC(){
     if(ransacCalculado){
-        hebra->setOperacion(1);
+        hebra->setOperacion(1,metodoCluster);
         hebra->insertarVoxels(voxels);
         hebra->start();
     }else
@@ -1628,13 +1645,16 @@ float GLArea::reCalidadDelEje(int genetico){
 
 void GLArea::ObtenerPlanosCorte(){
     vcg::Plane3f plano;
+    float Distancia;
     float altura = -glWrap.m->bbox.MaxDim();
     do{
         plano.Set(ejeFinal.Direction(),altura);
         altura = altura + 0.001;
         //cout << "\n" << altura << "\n";
     }while(!InterseccionPlanoPieza(plano,0));
-    altura += 0.001;
+    Distancia = altura;
+    altura += 0.002;
+    plano.Set(ejeFinal.Direction(),altura);
     InterseccionPlanoPieza(plano,0);
     altura = glWrap.m->bbox.MaxDim();
     emit AvanzarBarra((int) 20);
@@ -1643,7 +1663,14 @@ void GLArea::ObtenerPlanosCorte(){
         altura = altura - 0.001;
         //cout << "\n" << altura << "\n";
     }while(!InterseccionPlanoPieza(plano,1));
-    altura = altura - 0.001;
+    altura = altura - 0.002;
+    Distancia = Distancia - altura;
+    Distancia = Distancia / 8.;
+    altura = Distancia*3;
+    plano.Set(ejeFinal.Direction(),altura);
+    InterseccionPlanoPieza(plano,0);
+    altura = -altura;
+    plano.Set(ejeFinal.Direction(),altura);
     InterseccionPlanoPieza(plano,1);
 }
 

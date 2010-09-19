@@ -12,6 +12,12 @@ Configuracion::Configuracion(QWidget *parent, int * parametros) :
 
     m_ui->setupUi(this);
 
+    m_ui->amplitudMin->setHidden(true);
+    m_ui->amplitud->setHidden(true);
+    m_ui->limiteIteraciones->setHidden(true);
+    m_ui->refinarEje->setHidden(true);
+    m_ui->calcularEje->setHidden(true);
+
     if(parametros != 0){
         m_ui->limiteInferior->setValue(parametros[0]);
         m_ui->limiteMedio->setValue(parametros[1]);
@@ -70,10 +76,6 @@ void Configuracion::porDefecto(int * parametrosDefecto){
 
 void Configuracion::on_calcularEje_clicked()
 {
-    m_ui->porcentaje->setEnabled(m_ui->calcularEje->isChecked());
-    m_ui->limiteIntersec->setEnabled(m_ui->calcularEje->isChecked());
-    m_ui->limiteIteraciones->setEnabled(m_ui->calcularEje->isChecked());
-    m_ui->amplitud->setEnabled(m_ui->calcularEje->isChecked());
 }
 
 void Configuracion::on_predeterminado_clicked()

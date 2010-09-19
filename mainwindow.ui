@@ -1558,11 +1558,12 @@ p, li { white-space: pre-wrap; }
        <x>220</x>
        <y>30</y>
        <width>71</width>
-       <height>71</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="text">
-      <string>MENUSES</string>
+      <string>MENUS
+FIJOS</string>
      </property>
      <property name="icon">
       <iconset resource="Iconos.qrc">
@@ -2020,7 +2021,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>50</x>
        <y>300</y>
-       <width>31</width>
+       <width>71</width>
        <height>71</height>
       </rect>
      </property>
@@ -2047,10 +2048,10 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="geometry">
       <rect>
-       <x>90</x>
+       <x>30</x>
        <y>300</y>
-       <width>31</width>
-       <height>71</height>
+       <width>16</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -2058,7 +2059,7 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="icon">
       <iconset resource="Iconos.qrc">
-       <normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</normaloff>:/new/IconosReconstruccion/Iconos/Refinar.png</iconset>
+       <normaloff>:/new/IconosReconstruccion/Iconos/Refinar2.png</normaloff>:/new/IconosReconstruccion/Iconos/Refinar2.png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -2235,6 +2236,9 @@ p, li { white-space: pre-wrap; }
        <width>45</width>
        <height>45</height>
       </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="toolButtonStyle">
       <enum>Qt::ToolButtonTextUnderIcon</enum>

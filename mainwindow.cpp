@@ -28,6 +28,7 @@ MainWindow::MainWindow (QWidget * parent):QMainWindow (parent)
   salida = new QFile("depurando.txt");
   salida->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
   ficheroProyecto = new QFile();
+  ficheroTemp = new QFile ("temporal.sdc2");
   out = new QTextStream(salida);
   //int i=0;
   /*
@@ -303,7 +304,6 @@ void MainWindow::SetMenuExportar(bool valor){
   ui.BotonExportarDibujo->setHidden(valor);
 }
 
-
 void MainWindow::SetMenuReconstruccion(bool valor){
   valor = !valor;
   ui.etiquetaProcesado->setHidden(valor);
@@ -366,7 +366,6 @@ void MainWindow::SetMenuDibArq(bool valor){
   ui.lineaReconstruccion_2->setHidden(valor);
 }
 
-
 void MainWindow::SetMenuVisualizacion(bool valor){
   valor = !valor;
   ui.BotonMReconstruccion->setHidden(valor);
@@ -424,6 +423,7 @@ void MainWindow::SetMenuAplicacion(bool valor){
   ui.lineaVisualizacion->setHidden(valor);
   ui.lineaVisualizacion_2->setHidden(valor);
 }
+
 /*
 void MainWindow::on_actionAcerca_de_activated()
 {
@@ -436,6 +436,17 @@ void MainWindow::on_actionAcerca_de_Qt_activated()
      QMessageBox::aboutQt(this);
 }
 */
+
+void MainWindow::resetearTodo(){
+    estadoPieza = -2;
+    ui.BotonExportar->setEnabled(false);
+    ui.BotonM3D->setEnabled(false);
+    ui.BotonMDibArq->setEnabled(false);
+    ui.BotonMReconstruccion->setEnabled(false);
+    ui.BotonMEje->setEnabled(false);
+    ui.BotonMContorno->setEnabled(false);
+}
+
 void MainWindow::on_BotonSalir_clicked()
 {
      int reply;
@@ -444,6 +455,8 @@ void MainWindow::on_BotonSalir_clicked()
                                      tr("Salir sin guardar"), tr("Guardar y salir"), tr("Volver a la aplicacion"));
      if (reply == 0){
          salida->close();
+         ficheroTemp->close();
+         ficheroTemp->remove();
          /*if(salida2->isOpen())
             salida2->close();*/
          if(ficheroProyecto->isOpen()){
@@ -453,6 +466,8 @@ void MainWindow::on_BotonSalir_clicked()
          exit(0);
      }else if (reply == 1){
          salida->close();
+         ficheroTemp->close();
+         ficheroTemp->remove();
         /* if(salida2->isOpen())
             salida2->close();*/
          on_BotonGuardarProyecto_clicked();
@@ -472,6 +487,9 @@ void MainWindow::on_BotonImportar_clicked()
                     tr("Modelo ply (*.ply)"));
     if(!fileName.isEmpty()){
         if(QFile::exists(fileName)){
+            resetearTodo();
+            ProyectoCargado(true);
+            PiezaImportada();
             emit loadMesh(fileName,0);
             ui.BotonMEje->setEnabled(true);
             ui.BotonDibujar->setEnabled(true);
@@ -585,7 +603,6 @@ void MainWindow::on_BotonPantallaCompleta_clicked()
     on_BotonMAplicacionPulsado_clicked();
 }
 
-
 void MainWindow::resizeEvent(QResizeEvent * event){
     float variacionAnchura = this->width() - event->oldSize().width();
     if(ui.dockWidgetContents_3->x()+variacionAnchura/2. > 30)
@@ -631,7 +648,7 @@ void MainWindow::CrearConfiguracionEje(int * parametros){
 
 void MainWindow::on_BotonEje2_clicked()
 {
-    emit ui.glArea->reCalidadDelEje(1);
+    emit ui.glArea->reCalidadDelEje(0);
 }
 
 void MainWindow::on_BotonDibujar_clicked()
@@ -641,6 +658,7 @@ void MainWindow::on_BotonDibujar_clicked()
 
 void MainWindow::Imprimir(QString texto){
     (*out) << texto;
+    out->flush();
 }
 
 void MainWindow::ImprimirHistorigrama(QString texto){
@@ -698,7 +716,7 @@ void MainWindow::inicializarEje(int limInf, int limIntermedio, int porcentaje, i
     ui.sliderVoxeles->setEnabled(true);
     ui.tituloSliderVoxeles->setEnabled(true);
     BloquearCalculos(true);
-    emit ui.glArea->inicializarEje(limInf,limIntermedio,porcentaje,limiteIntersec,limiteIteracion,amplitud,amplitudMin,calcularVoxels,calcularEje,refinarEje);
+    emit ui.glArea->inicializarEje(limInf,limIntermedio,porcentaje,limiteIntersec,limiteIteracion,amplitud,amplitudMin,calcularVoxels,calcularEje,refinarEje,ui.BotonMetodo->isChecked());
 }
 
 void MainWindow::on_sliderVoxeles_sliderMoved(int position)
@@ -904,7 +922,6 @@ void MainWindow::on_BotonMenusDinamicos_clicked()
     on_BotonMAplicacionPulsado_clicked();
 }
 
-
 void MainWindow::TituloProyecto(QString texto){
         nombreProyecto.clear();
         nombreProyecto.append(texto);
@@ -919,6 +936,13 @@ void MainWindow::ProyectoCargado(bool valor){
     ui.BotonMModo->setEnabled(valor);
     ui.BotonCerrarProyecto->setEnabled(valor);
     ui.BotonImportar->setEnabled(valor);
+    estadoPieza = -1;
+}
+
+void MainWindow::PiezaImportada(){
+    ui.BotonMReconstruccion->setEnabled(true);
+    ui.BotonMEje->setEnabled(true);
+    estadoPieza = 0;
 }
 
 void MainWindow::EjeCalculado(bool valor){
@@ -928,6 +952,7 @@ void MainWindow::EjeCalculado(bool valor){
     ui.BotonContorno->setEnabled(valor);
     ui.BotonDibujarEje->setEnabled(valor);
     estadoPieza = 1;
+    GuardadoTemporal();
 }
 
 void MainWindow::activaBotonEje(){
@@ -955,11 +980,13 @@ void MainWindow::ObtenerEje(QString info){
 void MainWindow::ObtenerContorno(QString info){
     infoContorno.clear();
     infoContorno.append(info);
+    GuardadoTemporal();
 }
 
 void MainWindow::ObtenerFinal(QString info){
     infoFinal.clear();
     infoFinal.append(info);
+    GuardadoTemporal();
 }
 
 void MainWindow::on_BotonCerrarProyecto_clicked()
@@ -991,7 +1018,6 @@ void MainWindow::on_BotonCerrarProyecto_clicked()
         emit ui.glArea->CerrarProyecto();
     }
 }
-
 
 void MainWindow::on_BotonCargarProyecto_clicked()
 {
@@ -1094,10 +1120,11 @@ void MainWindow::on_BotonCargarProyecto_clicked()
     }
 }
 
-
 void MainWindow::on_BotonNuevoProyecto_clicked()
 {
     on_BotonMProyectoPulsado_clicked();
+    if(estadoPieza > -2)
+        on_BotonCerrarProyecto_clicked();
     //Introducir nombre del nuevo proyecto
     bool ok;
     QString texto = QInputDialog::getText(this,tr("Nombre del nuevo proyecto"),
@@ -1113,7 +1140,6 @@ void MainWindow::on_BotonNuevoProyecto_clicked()
     }
     estadoPieza = -1;
 }
-
 
 void MainWindow::on_BotonGuardarProyectoComo_clicked()
 {
@@ -1134,7 +1160,6 @@ void MainWindow::on_BotonGuardarProyectoComo_clicked()
     }
 }
 
-
 void MainWindow::on_BotonGuardarProyecto_clicked()
 {
     on_BotonMProyectoPulsado_clicked();
@@ -1144,7 +1169,7 @@ void MainWindow::on_BotonGuardarProyecto_clicked()
 
 
         (*outProyecto) << "%%SIDRAC2%%\n";
-        (*outProyecto) << nombreProyecto;
+        (*outProyecto) << nombreProyecto << "\n";
         (*outProyecto) << estadoPieza << "\n"; // negativo si no hay pieza, 0 si recien cargada, 1 con eje calculado, 2 con contorno seleccionado, 3 con mas info
         if(estadoPieza >= 0){
             (*outProyecto) << nombrePieza << "\n";
@@ -1168,6 +1193,31 @@ void MainWindow::on_BotonGuardarProyecto_clicked()
     }else{
         on_BotonGuardarProyectoComo_clicked();
     }
+}
+
+void MainWindow::GuardadoTemporal(){
+    ficheroTemp->open(QIODevice::ReadWrite | QIODevice::Text);
+    guardadoTemp = new QTextStream(ficheroTemp);
+    (*guardadoTemp) << "%%SIDRAC2%%\n";
+    (*guardadoTemp) << nombreProyecto << "\n";
+    (*guardadoTemp) << estadoPieza << "\n"; // negativo si no hay pieza, 0 si recien cargada, 1 con eje calculado, 2 con contorno seleccionado, 3 con mas info
+    if(guardadoTemp >= 0){
+        (*guardadoTemp) << nombrePieza << "\n";
+        if(estadoPieza >= 1){
+            //Solicitar informacion del eje
+            (*guardadoTemp) << infoEje << "\n";
+            if(estadoPieza >= 2){
+                //Solicitar informacion del contorno
+                (*guardadoTemp) << infoContorno << "\n";
+                if(estadoPieza >= 3){
+                    //Solicitar informacion del contorno
+                    (*guardadoTemp) << infoFinal << "\n";
+                }
+            }
+        }
+    }
+    guardadoTemp->flush();
+    ficheroTemp->close();
 }
 
 void MainWindow::on_BotonElementos_clicked()
@@ -1219,7 +1269,7 @@ void MainWindow::BloquearCalculos(bool valor){/*
 
 void MainWindow::on_BotonCalcularEje_clicked()
 {
-    emit ui.glArea->calcularInicializarEje();
+    emit ui.glArea->calcularInicializarEje(ui.BotonMetodo->isChecked());
     BloquearCalculos(true);
     ui.BotonEje2->setEnabled(true);
     ui.BotonTemporal->setEnabled(true);
@@ -1277,7 +1327,7 @@ void MainWindow::on_BotonExportarDibujo_clicked()
     on_BotonMExportarPulsado_clicked();
     QString fileName = QFileDialog::getSaveFileName(this,
                     tr("Exportar imagen"), QDir::currentPath(),
-                    tr("Todas las imagenes (*.png *.bmp *.jpg);;Imagen png (*.png);; Imagen bmp (*bmp);;Imagen jpg (*.jpg)"));
+                    tr("Todas las imagenes (*.png *.bmp *.jpg);;Imagen png (*.png);;Imagen bmp (*bmp);;Imagen jpg (*.jpg)"));
 
     if(!fileName.isEmpty()){
         QFile * exportarImagen = new QFile(fileName);
@@ -1300,8 +1350,9 @@ void MainWindow::ActivarReconstruccion(){
     ui.BotonMReconstruccion->setEnabled(false);
     ui.BotonMEje->setEnabled(false);
     ui.BotonMContorno->setEnabled(false);
+    estadoPieza = 2;
+    GuardadoTemporal();
 }
-
 
 void MainWindow::on_BotonMoverPieza_clicked()
 {

@@ -80,7 +80,14 @@ void hebraCalculoEje::ObtenerEjeSinNormales(){
     }
     emit setStatusBar(tr("Normales recorridas"));
 
-    contarClusterEje = (maxContador > 20);
+    if(clusterMetodo)
+        contarClusterEje = (maxContador > numCaras*0.2);
+    else
+        contarClusterEje = false;
+
+
+    if(contarClusterEje)
+        cout << "\n\nUtilizar metodo guay\n";
 
     caraActual = 0;
     if(contarClusterEje){
@@ -276,7 +283,7 @@ void hebraCalculoEje::ObtenerVoxelsNormal(vcg::Line3f normal, int caraActual){
 
 void hebraCalculoEje::RANSAC(){
     inicializarSemilla();
-  //  emit Imprimir("\nRealizando Ransac " + QString::number(porcentajeDeseado));
+    emit Imprimir("\nRealizando Ransac " + QString::number(porcentajeDeseado));
     int iteraciones = 0;
     float porcentaje, distancia;
     distancia =  amplitudVoxels*sqrt(nodoRaiz.X()*nodoRaiz.X()+

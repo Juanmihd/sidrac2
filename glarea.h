@@ -93,6 +93,7 @@ public slots:
     @param calcularVoxels : boolean que indica si se deben calcular los voxels o no
     @param calcularEje : boolean que indica si se debe calcular RANSAC o no
     @param refinarEje : boolean que indica que se va a refinar el eje (repetir RANSAC) o es la primera vez que se ejecuta
+    @param metodo : usar el metodo cluster o no
     */
   void inicializarEje(int limInf,
                       int limIntermedio,
@@ -103,7 +104,8 @@ public slots:
                       int amplitudMin,
                       bool calcularVoxels,
                       bool calcularEje,
-                      bool refinarEje);
+                      bool refinarEje,
+                      bool metodo);
   /**
     @brief Cambia el modo de dibujado
     */
@@ -151,8 +153,9 @@ public slots:
   void calcularEje();
   /**
     @brief Estima los valores del eje
+    @param metodo : Obtiene si se desea usar el metodo de cluster
     */
-  void calcularInicializarEje();
+  void calcularInicializarEje(bool metodo);
   /**
     @brief Resetea el contorno de la pieza
     */
@@ -216,6 +219,7 @@ public slots:
   void invertirEje(){
       invertido = !invertido;//ejeFinal.Set(ejeFinal.Direction()+ejeFinal.Origin(),ejeFinal.Direction()*(-1));
       alreves = -alreves;
+      updateGL();
       invertirMalla();
   }
   /**
@@ -424,6 +428,7 @@ private:
   GLfloat posicionLuzContorno;
   double nivelVoxels;
   bool moverPieza;
+  bool metodoCluster;
   bool invertido;
   bool mallaGirada;
   bool contornoInterior;

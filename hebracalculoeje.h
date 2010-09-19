@@ -43,7 +43,7 @@ public:
       @brief Inicializa la semilla del aleatorio.
       */
     void inicializarSemilla(){
-        int time = QTime::currentTime().second();
+        int time = 2;//QTime::currentTime().second();
         qsrand(time);
         emit Imprimir("\nSemilla inicializada con : " + QString::number(time));
     }
@@ -51,7 +51,7 @@ public:
       @brief Establece qué funcion deberá desempeñar la hebra cuando se inicialice
       @param i : el numero de la operacion
       */
-    void setOperacion(int i){operacion = i;}
+    void setOperacion(int i, bool metodo){operacion = i;clusterMetodo = metodo;}
     /**
       @brief Fija los parámetros que se tendran en cuenta para la obtencion del eje de rotación
       @param parametros : es un vector de enteros con los parametros a tener en cuenta
@@ -191,6 +191,7 @@ private:
     float distanciaMinima;
     bool contarClusterEje;
     bool calculoVoxels;
+    bool clusterMetodo;
     bool calculoEje;
     float thetaGlobal;
     float fiGlobal;

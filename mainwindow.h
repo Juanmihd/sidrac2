@@ -90,6 +90,7 @@ private:
   void SetMenuAplicacion(bool valor);
   void SetElementos(bool valor);
   void ProyectoCargado(bool valor);
+  void PiezaImportada();
   void EjeCalculado(bool valor);
   void BloquearCalculos(bool valor);
   void TituloProyecto(QString texto);
@@ -103,8 +104,10 @@ private:
   QFile * salida;
   QFile * salida2;
   QFile * ficheroProyecto;
+  QFile * ficheroTemp;
   QTextStream * outProyecto;
   QTextStream * out;
+  QTextStream * guardadoTemp;
 private slots:
     void on_BotonGuardarProyectoComo_clicked();
     void on_FijarVisualizacion_clicked();
@@ -184,6 +187,8 @@ private slots:
     void AcabarBarra();
     void obtenerPorDefecto();
     void ActivarReconstruccion();
+    void resetearTodo();
+    void GuardadoTemporal();
     void inicializarEje(int limInf, int limIntermedio, int porcentaje, int limiteIntersec, int limiteIteracion, int amplitud, int amplitudMin, bool calcularVoxels, bool calcularEje, bool refinarEje);
 };
 
